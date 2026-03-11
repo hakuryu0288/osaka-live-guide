@@ -345,17 +345,13 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
 
 <!-- HERO -->
 <div class="site-hero">
-  <div class="hero-title">大阪の<em>ライブ情報</em>をひとまとめに</div>
+  <div class="hero-title">大阪のライブ情報</div>
   <div class="hero-meta">
     <div>
-      <div class="hero-stat-num" id="stat-events">—</div>
-      <div class="hero-stat-label">EVENTS / MONTH</div>
+      <div class="hero-stat-num" id="hero-date-num">—</div>
+      <div class="hero-stat-label" id="hero-date-label">—</div>
     </div>
-    <div>
-      <div class="hero-stat-num" id="stat-venues">15</div>
-      <div class="hero-stat-label">VENUES</div>
-    </div>
-    <div class="hero-desc">心斎橋・梅田エリアのライブ情報を一元管理。<br>エリア・ジャンル・会場で絞り込めます。</div>
+    <div class="hero-desc">心斎橋・梅田エリアのライブ情報を<br>エリア・ジャンル・会場で絞り込めます。</div>
   </div>
 </div>
 
@@ -494,19 +490,27 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
     </div>
     <div class="admin-body">
 
-      <div class="form-section">
-        <div class="form-section-title">📊 スプレッドシート設定</div>
-        <div class="form-note">
-          Googleスプレッドシートの「ウェブに公開 → CSV」URLを貼り付けてください。<br>
-          列順: <strong>date / time / title / venue / genre / price / acts / ticket_url</strong>
+      <!-- ★ スプレッドシート設定（最優先で上に） -->
+      <div class="form-section" style="background:#fff8f0;border:2px solid var(--accent2);padding:1rem;margin-bottom:1.4rem;">
+        <div class="form-section-title" style="font-size:0.9rem;">📊 スプレッドシート設定</div>
+        <div class="form-note" style="margin-bottom:0.8rem;">
+          GoogleスプレッドシートをCSVで公開したURLを貼り付けてください。<br>
+          <strong>列順:</strong> date / time / title / venue / genre / price / acts / ticket_url<br>
+          （1行目はヘッダー行）
         </div>
         <div class="form-row">
-          <label class="form-label">スプレッドシートURL</label>
+          <label class="form-label">現在の設定URL</label>
+          <div class="setup-url-display" id="url-display" style="margin-bottom:0.6rem;">未設定</div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">新しいURLを設定 *</label>
           <input class="form-input" id="sheet-url-input" type="url" placeholder="https://docs.google.com/spreadsheets/d/XXXX/pub?output=csv">
         </div>
-        <div class="setup-url-display" id="url-display">未設定</div>
         <div class="form-row" style="margin-top:0.8rem;">
-          <button class="form-submit" onclick="saveSheetUrl()">保存して読み込む</button>
+          <button class="form-submit" onclick="saveSheetUrl()">💾 保存して今すぐ読み込む</button>
+        </div>
+        <div style="margin-top:0.6rem;">
+          <button class="form-submit" style="background:var(--ink);font-size:0.72rem;padding:0.6rem;" onclick="clearSheetUrl()">🗑 URL設定をリセット</button>
         </div>
       </div>
 
@@ -798,7 +802,6 @@ function updateCounts() {
   document.getElementById('cnt-all').textContent = m.length;
   document.getElementById('cnt-shinsaibashi').textContent = m.filter(e => VENUES[e.venue]?.area==='shinsaibashi').length;
   document.getElementById('cnt-umeda').textContent = m.filter(e => VENUES[e.venue]?.area==='umeda').length;
-  document.getElementById('stat-events').textContent = m.length;
 }
 
 // ===== Render =====
@@ -933,9 +936,17 @@ function switchView(v) {
 
 // ===== Admin =====
 function openAdmin() {
-  const u=getSheetUrl(); document.getElementById('sheet-url-input').value=u;
-  document.getElementById('url-display').textContent=u?'設定済み: '+u.slice(0,55)+'...':'未設定';
+  const u = getSheetUrl();
+  document.getElementById('sheet-url-input').value = u;
+  document.getElementById('url-display').textContent = u ? u : '未設定';
   document.getElementById('admin-overlay').classList.add('open');
+}
+function clearSheetUrl() {
+  if (!confirm('スプレッドシートのURL設定をリセットしますか？')) return;
+  setSheetUrl('');
+  document.getElementById('sheet-url-input').value = '';
+  document.getElementById('url-display').textContent = '未設定';
+  showToast('✓ URL設定をリセットしました');
 }
 function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
 function closeAdminOutside(e) { if(e.target===document.getElementById('admin-overlay')) closeAdmin(); }
@@ -978,8 +989,17 @@ function showToast(msg){ const t=document.getElementById('toast'); t.textContent
 // ===== Init =====
 (function(){
   checkAdminMode();
-  const now=new Date(); curYear=now.getFullYear(); curMonth=now.getMonth();
-  document.getElementById('month-display').textContent=`${curYear}年 ${MONTHS[curMonth]}`;
+  const now = new Date();
+  curYear = now.getFullYear(); curMonth = now.getMonth();
+  document.getElementById('month-display').textContent = `${curYear}年 ${MONTHS[curMonth]}`;
+
+  // ヒーロー: 今日の日付表示
+  const todayNum = now.getDate();
+  const todayDow = DAYS[now.getDay()];
+  const todayMonth = now.getMonth() + 1;
+  document.getElementById('hero-date-num').textContent = `${todayMonth}/${todayNum}`;
+  document.getElementById('hero-date-label').textContent = `TODAY（${todayDow}）`;
+
   buildVenueChips();
   loadFromSheet(false);
 })();
