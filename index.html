@@ -716,7 +716,7 @@ function exitAdminMode() {
 }
 
 // ===== Sheet URL =====
-let SHEET_URL = '';
+let SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSJS9ygZtSKS0rzlWOk1hLlkRjHeleR8AwNO8mickvGxuW2-uA6E--QZYLC0vMtAunDTU_lXOhZrUXl/pub?gid=0&single=true&output=csv';
 function getSheetUrl() { try { return localStorage.getItem('olg_sheet_url') || ''; } catch(e) { return SHEET_URL; } }
 function setSheetUrl(u) { SHEET_URL = u; try { localStorage.setItem('olg_sheet_url', u); } catch(e) {} }
 
@@ -740,7 +740,9 @@ function parseCSV(text) {
     if (!VENUES[venue]) return acc;
     const gm = {'アイドル':'idol','idol':'idol','バンド':'band','band':'band','その他':'other','other':'other'};
     const genre = gm[(gRaw||'').toLowerCase().trim()] || 'other';
-    acc.push({ id:`s${i}`, date:date.trim(), open:(open||'').trim()||'', time:(time||'').trim()||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
+    // 時刻の秒を除去（17:00:00 → 17:00）
+    const normalizeTime = t => (t||'').trim().replace(/^(\d{1,2}:\d{2}):\d{2}$/, '$1') || '';
+    acc.push({ id:`s${i}`, date:date.trim(), open:normalizeTime(open), time:normalizeTime(time)||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
     return acc;
   }, []);
 }
