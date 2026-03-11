@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OSAKA LIVE GUIDE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Syne+Mono&display=swap" rel="stylesheet">
 <style>
+/* ===== VARIABLES ===== */
 :root {
   --bg: #f2ede8;
   --bg2: #e8e2db;
@@ -22,545 +23,220 @@
   --other: #6e2a8a;
   --border: #d0c8be;
   --white: #faf7f4;
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --sidebar-w: 260px;
+  --header-h-pc: 60px;
+  --header-h-sp: 52px;
 }
-
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Noto Sans JP', sans-serif;
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow-x: hidden;
-}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-serif; min-height:100vh; overflow-x:hidden; }
 
 /* ===== LOADING ===== */
-.loading-screen {
-  position: fixed; inset: 0;
-  background: var(--white);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  z-index: 999;
-  transition: opacity 0.4s;
-}
-.loading-screen.hidden { opacity: 0; pointer-events: none; }
-.loading-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.6rem; margin-bottom:1.5rem; }
+.loading-screen { position:fixed; inset:0; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999; transition:opacity 0.4s; }
+.loading-screen.hidden { opacity:0; pointer-events:none; }
+.loading-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.8rem; margin-bottom:1.5rem; }
 .loading-logo em { color:var(--accent); font-style:normal; }
-.loading-bar { width:160px; height:2px; background:var(--border); position:relative; overflow:hidden; }
+.loading-bar { width:180px; height:2px; background:var(--border); position:relative; overflow:hidden; }
 .loading-bar::after { content:''; position:absolute; left:-50%; width:50%; height:100%; background:var(--accent); animation:loadanim 1s ease infinite; }
 @keyframes loadanim { 0%{left:-50%} 100%{left:100%} }
 .loading-text { margin-top:1rem; font-family:'Syne Mono',monospace; font-size:0.58rem; letter-spacing:0.2em; color:var(--ink3); }
 
-/* ===== HEADER (Mobile-first) ===== */
-.sp-header {
-  position: sticky; top: 0; z-index: 100;
-  background: var(--ink);
-  display: flex; align-items: center;
-  padding: 0 1rem;
-  height: 52px;
-  gap: 0.5rem;
+/* ===== HEADER ===== */
+.site-header {
+  position:sticky; top:0; z-index:200;
+  background:var(--ink);
+  display:flex; align-items:center;
+  height:var(--header-h-sp);
+  padding:0 1rem; gap:0.6rem;
+  border-bottom:2px solid var(--accent);
 }
-.sp-logo {
-  font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: 1rem; color: var(--white);
-  letter-spacing: -0.01em; flex: 1;
-}
-.sp-logo em { color: var(--accent2); font-style: normal; }
+.header-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--white); letter-spacing:-0.01em; flex:1; white-space:nowrap; }
+.header-logo em { color:var(--accent2); font-style:normal; }
+.header-update { font-family:'Syne Mono',monospace; font-size:0.5rem; letter-spacing:0.1em; color:rgba(255,255,255,0.35); display:none; }
+.header-actions { display:flex; gap:0.4rem; align-items:center; }
+.hdr-btn { height:34px; padding:0 0.8rem; border:1px solid rgba(255,255,255,0.2); background:none; color:rgba(255,255,255,0.7); cursor:pointer; font-family:'Syne Mono',monospace; font-size:0.58rem; letter-spacing:0.08em; transition:all 0.15s; display:flex; align-items:center; gap:0.3rem; border-radius:3px; }
+.hdr-btn:hover { background:rgba(255,255,255,0.1); color:var(--white); }
+.hdr-btn.spinning { animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.autoupdate-badge { display:flex; align-items:center; gap:0.3rem; font-family:'Syne Mono',monospace; font-size:0.5rem; letter-spacing:0.1em; color:rgba(255,255,255,0.4); padding:0 0.5rem; }
+.badge-dot { width:5px; height:5px; border-radius:50%; background:var(--accent2); animation:blink 2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-.sp-refresh-btn {
-  width: 36px; height: 36px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: none; color: rgba(255,255,255,0.7);
-  border-radius: 6px; cursor: pointer;
-  font-size: 1rem; display: flex; align-items:center; justify-content:center;
-  transition: all 0.2s;
-}
-.sp-refresh-btn:active { background: rgba(255,255,255,0.1); }
-.sp-refresh-btn.spinning { animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ===== HERO ===== */
+.site-hero { background:var(--ink); color:var(--white); padding:1.2rem 1rem; border-bottom:2px solid var(--accent); position:relative; overflow:hidden; }
+.site-hero::before { content:'OSAKA'; font-family:'Syne',sans-serif; font-weight:800; font-size:28vw; position:absolute; right:-2vw; top:50%; transform:translateY(-50%); color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.04); pointer-events:none; line-height:1; }
+.hero-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; line-height:1.15; }
+.hero-title em { color:var(--accent2); font-style:normal; display:block; }
+.hero-meta { display:flex; gap:1.5rem; margin-top:0.7rem; align-items:center; }
+.hero-stat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:1.6rem; line-height:1; color:var(--accent2); }
+.hero-stat-label { font-family:'Syne Mono',monospace; font-size:0.46rem; letter-spacing:0.15em; color:rgba(255,255,255,0.35); }
+.hero-desc { font-size:0.7rem; font-weight:300; color:rgba(255,255,255,0.45); line-height:1.8; letter-spacing:0.03em; }
 
-.sp-filter-btn {
-  height: 36px; padding: 0 0.9rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: none; color: rgba(255,255,255,0.7);
-  border-radius: 6px; cursor: pointer;
-  font-family: 'Syne Mono', monospace;
-  font-size: 0.6rem; letter-spacing: 0.08em;
-  display: flex; align-items:center; gap:0.3rem;
-  transition: all 0.2s;
-}
-.sp-filter-btn:active { background: rgba(255,255,255,0.1); }
+/* ===== BODY LAYOUT ===== */
+/* SP: single column */
+.body-wrap { display:block; }
 
-/* auto-update indicator */
-.autoupdate-bar {
-  background: rgba(201,74,30,0.12);
-  border-bottom: 1px solid rgba(201,74,30,0.2);
-  padding: 0.3rem 1rem;
-  display: flex; align-items:center; justify-content:space-between;
-  font-family: 'Syne Mono', monospace;
-  font-size: 0.55rem; letter-spacing: 0.1em; color: var(--ink3);
-}
-.autoupdate-dot { width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 2s ease infinite; margin-right:0.4rem; display:inline-block; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-.next-update { color: var(--accent); font-weight:400; }
+/* ===== FILTER PANEL (SP: horizontal scroll chips, PC: sidebar) ===== */
+/* --- SP FILTER SECTION (inline, above calendar) --- */
+.sp-filter-section { background:var(--white); border-bottom:2px solid var(--border); }
 
-/* ===== HERO (compact mobile) ===== */
-.sp-hero {
-  background: var(--ink);
-  color: var(--white);
-  padding: 1.2rem 1rem 1rem;
-  border-bottom: 2px solid var(--accent);
-  position: relative; overflow: hidden;
-}
-.sp-hero::before {
-  content: 'OSAKA';
-  font-family:'Syne',sans-serif; font-weight:800;
-  font-size: 30vw;
-  position: absolute; right:-3vw; top:50%; transform:translateY(-50%);
-  color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.04);
-  pointer-events:none; line-height:1;
-}
-.sp-hero-title {
-  font-family:'Syne',sans-serif; font-weight:800;
-  font-size: 1.5rem; line-height:1.15; letter-spacing:-0.01em;
-}
-.sp-hero-title em { color:var(--accent2); font-style:normal; display:block; }
-.sp-hero-stats {
-  display: flex; gap: 1.5rem; margin-top: 0.8rem;
-}
-.sp-stat { }
-.sp-stat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:1.6rem; line-height:1; color:var(--accent2); }
-.sp-stat-label { font-family:'Syne Mono',monospace; font-size:0.48rem; letter-spacing:0.15em; color:rgba(255,255,255,0.35); }
+.filter-block { padding:0.8rem 1rem; border-bottom:1px solid var(--border); }
+.filter-block:last-child { border-bottom:none; }
+.filter-block-label { font-family:'Syne Mono',monospace; font-size:0.52rem; letter-spacing:0.2em; color:var(--ink3); margin-bottom:0.6rem; text-transform:uppercase; display:flex; align-items:center; justify-content:space-between; }
+.filter-collapse-btn { font-size:0.7rem; border:none; background:none; cursor:pointer; color:var(--ink3); padding:0 0.2rem; transition:transform 0.2s; }
+.filter-collapse-btn.open { transform:rotate(180deg); }
+.filter-block-body { overflow:hidden; transition:max-height 0.3s ease; }
+.filter-block-body.collapsed { max-height:0 !important; }
 
-/* ===== AREA TABS (horizontal scroll) ===== */
-.area-scroll {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.area-scroll::-webkit-scrollbar { display:none; }
-.area-scroll-btn {
-  flex-shrink: 0;
-  padding: 0.7rem 1.2rem;
-  border: none; border-right: 1px solid var(--border);
-  background: none; cursor: pointer;
-  font-family: 'Syne', sans-serif; font-weight: 700;
-  font-size: 0.75rem; letter-spacing: 0.05em;
-  color: var(--ink3);
-  display: flex; align-items:center; gap:0.4rem;
-  white-space: nowrap;
-  position: relative;
-  transition: color 0.15s;
-}
-.area-scroll-btn::after {
-  content:''; position:absolute; bottom:0; left:0; right:0;
-  height:2px; background:var(--accent);
-  transform: scaleX(0); transition: transform 0.15s;
-}
-.area-scroll-btn.active { color:var(--accent); }
-.area-scroll-btn.active::after { transform: scaleX(1); }
-.area-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
-.area-cnt { font-family:'Syne Mono',monospace; font-size:0.55rem; opacity:0.5; }
+/* AREA CHIPS */
+.chip-row { display:flex; flex-wrap:wrap; gap:0.4rem; }
+.chip { padding:0.35rem 0.8rem; border:1.5px solid var(--border); background:var(--bg); cursor:pointer; font-family:'Syne',sans-serif; font-weight:700; font-size:0.68rem; letter-spacing:0.04em; color:var(--ink3); transition:all 0.15s; border-radius:2px; display:flex; align-items:center; gap:0.3rem; white-space:nowrap; user-select:none; }
+.chip:hover { border-color:var(--ink2); color:var(--ink); }
+.chip.active { background:var(--ink); color:var(--white); border-color:var(--ink); }
+.chip.area-s.active { background:var(--shinsaibashi); border-color:var(--shinsaibashi); }
+.chip.area-u.active { background:var(--umeda); border-color:var(--umeda); }
+.chip-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.chip-cnt { font-family:'Syne Mono',monospace; font-size:0.5rem; opacity:0.6; }
 
-/* ===== MONTH NAV ===== */
-.month-nav-bar {
-  display: flex; align-items:center; justify-content:space-between;
-  padding: 0.8rem 1rem;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
-.month-nav-btn {
-  width: 38px; height: 38px;
-  border: 1.5px solid var(--ink);
-  background: var(--white); cursor:pointer;
-  font-size: 0.9rem;
-  display:flex; align-items:center; justify-content:center;
-  border-radius: 4px;
-  transition: all 0.15s;
-}
-.month-nav-btn:active { background:var(--ink); color:var(--white); }
-.month-label {
-  font-family:'Syne',sans-serif; font-weight:800;
-  font-size: 1.2rem; letter-spacing:-0.01em;
-}
+/* GENRE TOGGLE ROW */
+.genre-toggle-row { display:flex; gap:0.4rem; flex-wrap:wrap; }
+.genre-chip { padding:0.35rem 0.9rem; border:1.5px solid var(--border); background:var(--bg); cursor:pointer; font-size:0.7rem; font-weight:500; letter-spacing:0.04em; color:var(--ink3); transition:all 0.15s; border-radius:2px; display:flex; align-items:center; gap:0.35rem; user-select:none; }
+.genre-chip.active.idol { background:var(--idol); border-color:var(--idol); color:var(--white); }
+.genre-chip.active.band { background:var(--band); border-color:var(--band); color:var(--white); }
+.genre-chip.active.other { background:var(--other); border-color:var(--other); color:var(--white); }
 
-/* ===== VIEW TOGGLE ===== */
-.view-toggle-bar {
-  display: flex;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-}
-.view-toggle-btn {
-  flex: 1; padding: 0.6rem;
-  border: none; background:none; cursor:pointer;
-  font-family:'Syne Mono',monospace; font-size:0.65rem;
-  letter-spacing:0.1em; color:var(--ink3);
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s;
-}
-.view-toggle-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+/* VENUE CHIPS (scrollable row) */
+.venue-chip-scroll { display:flex; flex-wrap:wrap; gap:0.35rem; }
+.venue-chip { padding:0.3rem 0.7rem; border:1.5px solid var(--border); background:var(--bg); cursor:pointer; font-size:0.62rem; font-weight:400; color:var(--ink3); transition:all 0.15s; border-radius:2px; white-space:nowrap; user-select:none; }
+.venue-chip:hover { border-color:var(--ink2); color:var(--ink); }
+.venue-chip.active { background:var(--white); border-color:var(--ink); color:var(--ink); font-weight:500; }
+.venue-chip[data-area="shinsaibashi"].active { border-color:var(--shinsaibashi); color:var(--shinsaibashi); }
+.venue-chip[data-area="umeda"].active { border-color:var(--umeda); color:var(--umeda); }
+.venue-section-label { font-family:'Syne Mono',monospace; font-size:0.5rem; letter-spacing:0.15em; color:var(--ink3); padding:0.3rem 0 0.4rem; display:block; }
+
+/* ===== MONTH + VIEW CONTROLS ===== */
+.cal-controls { background:var(--bg); border-bottom:1px solid var(--border); padding:0.7rem 1rem; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+.month-nav { display:flex; align-items:center; gap:0.5rem; }
+.month-btn { width:34px; height:34px; border:1.5px solid var(--ink); background:var(--white); cursor:pointer; font-size:0.8rem; display:flex; align-items:center; justify-content:center; border-radius:3px; transition:all 0.15s; }
+.month-btn:hover { background:var(--ink); color:var(--white); }
+.month-label { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; letter-spacing:-0.01em; min-width:110px; text-align:center; }
+.view-toggle { display:flex; border:1.5px solid var(--ink); border-radius:3px; overflow:hidden; }
+.view-btn { padding:0.4rem 0.9rem; border:none; background:var(--white); cursor:pointer; font-family:'Syne Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; color:var(--ink3); border-right:1px solid var(--border); transition:all 0.15s; }
+.view-btn:last-child { border-right:none; }
+.view-btn.active { background:var(--ink); color:var(--white); }
 
 /* ===== RESULTS BAR ===== */
-.results-bar {
-  padding: 0.5rem 1rem;
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items:center; justify-content:space-between;
-  font-family:'Syne Mono',monospace; font-size:0.58rem;
-  letter-spacing:0.08em; color:var(--ink3);
-}
-.results-count { font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem; color:var(--accent); }
+.results-bar { background:var(--white); border-bottom:1px solid var(--border); padding:0.45rem 1rem; display:flex; align-items:center; justify-content:space-between; font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.08em; color:var(--ink3); }
+.results-count { font-family:'Syne',sans-serif; font-weight:700; font-size:0.88rem; color:var(--accent); letter-spacing:0; }
 
-/* ===== CALENDAR (Mobile) ===== */
+/* ===== CALENDAR ===== */
 #cal-view { background:var(--white); }
-.cal-dow-row {
-  display:grid; grid-template-columns:repeat(7,1fr);
-  background:var(--ink);
-  border-bottom:1px solid rgba(255,255,255,0.1);
-}
-.cal-dow {
-  padding:0.4rem 0; text-align:center;
-  font-family:'Syne Mono',monospace; font-size:0.55rem;
-  letter-spacing:0.08em; color:rgba(255,255,255,0.45);
-}
+.cal-dow-row { display:grid; grid-template-columns:repeat(7,1fr); background:var(--ink); }
+.cal-dow { padding:0.45rem 0; text-align:center; font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.08em; color:rgba(255,255,255,0.4); }
 .cal-dow.sun { color:#e8865e; }
 .cal-dow.sat { color:#6ea8e8; }
 .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--border); }
-.cal-cell {
-  background:var(--white); min-height:64px; padding:0.25rem;
-  cursor:pointer; position:relative;
-}
-.cal-cell:active { background:var(--bg2); }
-.cal-cell.other-month { background:var(--bg2); opacity:0.4; pointer-events:none; }
+.cal-cell { background:var(--white); min-height:62px; padding:0.25rem; cursor:pointer; transition:background 0.1s; }
+.cal-cell:hover { background:var(--bg); }
+.cal-cell.other-month { background:var(--bg2); opacity:0.35; pointer-events:none; }
 .cal-cell.today { background:#fff8f5; }
-.cell-num {
-  font-family:'Syne',sans-serif; font-weight:700;
-  font-size:0.7rem; color:var(--ink3);
-  width:20px; height:20px;
-  display:flex; align-items:center; justify-content:center;
-}
-.cal-cell.today .cell-num { background:var(--accent); color:var(--white); border-radius:50%; font-size:0.65rem; }
+.cell-num { font-family:'Syne',sans-serif; font-weight:700; font-size:0.68rem; color:var(--ink3); width:20px; height:20px; display:flex; align-items:center; justify-content:center; }
+.cal-cell.today .cell-num { background:var(--accent); color:var(--white); border-radius:50%; font-size:0.6rem; }
 .cal-cell.sun .cell-num { color:#c94a1e66; }
 .cal-cell.sat .cell-num { color:#1e6ac966; }
-.cell-dots { display:flex; flex-wrap:wrap; gap:2px; margin-top:2px; padding:0 1px; }
-.cell-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-.cell-count { font-family:'Syne Mono',monospace; font-size:0.48rem; color:var(--ink3); margin-top:1px; }
+.cell-dots { display:flex; flex-wrap:wrap; gap:2px; margin-top:2px; }
+.cell-dot { width:6px; height:6px; border-radius:50%; }
+.cell-count { font-family:'Syne Mono',monospace; font-size:0.46rem; color:var(--ink3); margin-top:2px; }
 
-/* Day event list (shown when cell tapped) */
-.day-events-panel {
-  display:none;
-  background:var(--white);
-  border-top:2px solid var(--accent);
-  border-bottom:1px solid var(--border);
-}
-.day-events-panel.open { display:block; }
-.day-events-header {
-  padding:0.6rem 1rem;
-  background:var(--bg2);
-  font-family:'Syne',sans-serif; font-weight:700;
-  font-size:0.8rem; letter-spacing:0.03em;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.day-events-close {
-  font-family:'Syne Mono',monospace; font-size:0.6rem;
-  border:none; background:none; cursor:pointer; color:var(--ink3);
-  padding:0.2rem 0.5rem; border:1px solid var(--border);
-}
+/* Day panel */
+.day-panel { display:none; background:var(--white); border-top:2px solid var(--accent); border-bottom:1px solid var(--border); }
+.day-panel.open { display:block; }
+.day-panel-header { padding:0.55rem 1rem; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.day-panel-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.82rem; }
+.day-panel-close { border:none; background:none; font-size:0.9rem; cursor:pointer; color:var(--ink3); padding:0.2rem 0.5rem; border:1px solid var(--border); font-family:'Syne Mono',monospace; font-size:0.58rem; }
 
 /* ===== LIST VIEW ===== */
 #list-view { display:none; }
 .list-date-group { }
-.list-date-header {
-  padding: 0.6rem 1rem 0.4rem;
-  display:flex; align-items:center; gap:0.8rem;
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  position:sticky; top:52px; z-index:10;
-}
-.list-date-num {
-  font-family:'Syne',sans-serif; font-weight:800;
-  font-size:1.6rem; line-height:1; min-width:36px;
-}
-.list-date-meta { font-family:'Syne Mono',monospace; font-size:0.58rem; letter-spacing:0.1em; color:var(--ink3); }
-.list-date-cnt {
-  margin-left:auto;
-  font-family:'Syne Mono',monospace; font-size:0.55rem;
-  color:var(--accent); letter-spacing:0.1em;
-}
+.list-date-header { padding:0.55rem 1rem 0.4rem; display:flex; align-items:center; gap:0.7rem; background:var(--bg2); border-bottom:1px solid var(--border); border-top:1px solid var(--border); position:sticky; top:var(--header-h-sp); z-index:10; }
+.list-date-num { font-family:'Syne',sans-serif; font-weight:800; font-size:1.5rem; line-height:1; min-width:32px; }
+.list-date-meta { font-family:'Syne Mono',monospace; font-size:0.56rem; letter-spacing:0.1em; color:var(--ink3); }
+.list-date-cnt { margin-left:auto; font-family:'Syne Mono',monospace; font-size:0.52rem; color:var(--accent); }
 
-/* ===== EVENT CARD (mobile) ===== */
-.event-card-sp {
-  display:flex; align-items:stretch;
-  background:var(--white);
-  border-bottom:1px solid var(--border);
-  cursor:pointer;
-  transition:background 0.1s;
-  position:relative;
-}
-.event-card-sp:active { background:var(--bg); }
+/* ===== EVENT CARD (shared SP/PC) ===== */
+.event-card { display:flex; align-items:stretch; background:var(--white); border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; }
+.event-card:hover { background:var(--bg); }
 .ec-stripe { width:4px; flex-shrink:0; }
-.ec-time {
-  padding:0.9rem 0.7rem;
-  font-family:'Syne',sans-serif; font-weight:700;
-  font-size:0.8rem; color:var(--ink2);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:0.1rem; background:var(--bg); flex-shrink:0; min-width:52px;
-  border-right:1px solid var(--border);
-}
-.ec-time span { font-family:'Syne Mono',monospace; font-size:0.45rem; letter-spacing:0.08em; color:var(--ink3); }
-.ec-body { padding:0.7rem 0.8rem; flex:1; min-width:0; }
-.ec-tags { display:flex; gap:0.25rem; flex-wrap:wrap; margin-bottom:0.35rem; }
-.sp-tag {
-  font-family:'Syne Mono',monospace; font-size:0.5rem;
-  letter-spacing:0.06em; padding:0.1rem 0.35rem; border:1px solid;
-}
-.sp-tag-idol { border-color:var(--idol); color:var(--idol); }
-.sp-tag-band { border-color:var(--band); color:var(--band); }
-.sp-tag-other { border-color:var(--other); color:var(--other); }
-.sp-tag-venue { border-color:var(--border); color:var(--ink3); }
-.sp-tag-area-s { border-color:var(--shinsaibashi); color:var(--shinsaibashi); }
-.sp-tag-area-u { border-color:var(--umeda); color:var(--umeda); }
-.ec-title { font-size:0.82rem; font-weight:500; line-height:1.45; letter-spacing:0.02em; margin-bottom:0.2rem; }
-.ec-acts { font-size:0.62rem; color:var(--ink3); letter-spacing:0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.ec-arrow {
-  display:flex; align-items:center; padding:0 0.7rem;
-  color:var(--border); font-size:0.7rem; flex-shrink:0;
-}
+.ec-time { padding:0.8rem 0.6rem; font-family:'Syne',sans-serif; font-weight:700; font-size:0.78rem; color:var(--ink2); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.1rem; background:var(--bg); flex-shrink:0; min-width:48px; border-right:1px solid var(--border); }
+.ec-time span { font-family:'Syne Mono',monospace; font-size:0.44rem; letter-spacing:0.08em; color:var(--ink3); }
+.ec-body { padding:0.65rem 0.8rem; flex:1; min-width:0; }
+.ec-tags { display:flex; gap:0.25rem; flex-wrap:wrap; margin-bottom:0.3rem; }
+.ev-tag { font-family:'Syne Mono',monospace; font-size:0.48rem; letter-spacing:0.06em; padding:0.1rem 0.35rem; border:1px solid; }
+.ev-tag-idol { border-color:var(--idol); color:var(--idol); }
+.ev-tag-band { border-color:var(--band); color:var(--band); }
+.ev-tag-other { border-color:var(--other); color:var(--other); }
+.ev-tag-venue { border-color:var(--border); color:var(--ink3); }
+.ev-tag-area-s { border-color:var(--shinsaibashi); color:var(--shinsaibashi); }
+.ev-tag-area-u { border-color:var(--umeda); color:var(--umeda); }
+.ec-title { font-size:0.8rem; font-weight:500; line-height:1.45; letter-spacing:0.02em; margin-bottom:0.2rem; }
+.ec-acts { font-size:0.6rem; color:var(--ink3); letter-spacing:0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ec-arrow { display:flex; align-items:center; padding:0 0.65rem; color:var(--border); font-size:0.8rem; flex-shrink:0; }
 
-/* ===== DETAIL SHEET (bottom sheet on mobile) ===== */
-.detail-overlay {
-  display:none; position:fixed; inset:0;
-  background:rgba(26,20,16,0.5);
-  z-index:300; backdrop-filter:blur(2px);
-}
+/* ===== DETAIL BOTTOM SHEET (SP) / SIDE PANEL (PC) ===== */
+.detail-overlay { display:none; position:fixed; inset:0; background:rgba(26,20,16,0.5); z-index:300; backdrop-filter:blur(2px); }
 .detail-overlay.open { display:block; }
-.detail-sheet {
-  position:fixed; bottom:0; left:0; right:0;
-  background:var(--white);
-  border-top:2px solid var(--ink);
-  border-radius:0;
-  max-height:85dvh;
-  overflow-y:auto;
-  z-index:301;
-  transform:translateY(100%);
-  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
-  padding-bottom:calc(1.5rem + var(--safe-bottom));
-}
+.detail-sheet { position:fixed; bottom:0; left:0; right:0; background:var(--white); border-top:2px solid var(--ink); max-height:88dvh; overflow-y:auto; z-index:301; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.22,1,0.36,1); padding-bottom:env(safe-area-inset-bottom,0); }
 .detail-overlay.open .detail-sheet { transform:translateY(0); }
-.detail-sheet-handle {
-  display:flex; justify-content:center; padding:0.8rem 0 0;
-}
-.detail-sheet-handle::before {
-  content:''; width:36px; height:3px;
-  background:var(--border); border-radius:2px;
-}
-.detail-sheet-header { padding:1rem 1rem 0.8rem; border-bottom:1px solid var(--border); }
-.detail-area-badge {
-  font-family:'Syne Mono',monospace; font-size:0.52rem;
-  letter-spacing:0.15em; padding:0.12rem 0.45rem;
-  border:1px solid; display:inline-block; margin-bottom:0.6rem;
-}
-.detail-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; line-height:1.2; margin-bottom:0.3rem; }
-.detail-venue { font-size:0.68rem; color:var(--ink3); }
+.detail-sheet-handle { display:flex; justify-content:center; padding:0.7rem 0 0; }
+.detail-sheet-handle::before { content:''; width:36px; height:3px; background:var(--border); border-radius:2px; }
+.detail-header { padding:0.9rem 1rem 0.7rem; border-bottom:1px solid var(--border); }
+.detail-area-badge { font-family:'Syne Mono',monospace; font-size:0.5rem; letter-spacing:0.15em; padding:0.12rem 0.45rem; border:1px solid; display:inline-block; margin-bottom:0.5rem; }
+.detail-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.15rem; line-height:1.2; margin-bottom:0.3rem; }
+.detail-venue-name { font-size:0.68rem; color:var(--ink3); }
 .detail-body { padding:0 1rem; }
-.detail-row {
-  display:flex; gap:0.8rem; padding:0.8rem 0;
-  border-bottom:1px solid var(--border);
-}
+.detail-row { display:flex; gap:0.8rem; padding:0.75rem 0; border-bottom:1px solid var(--border); }
 .detail-row:last-child { border-bottom:none; }
-.detail-key { font-family:'Syne Mono',monospace; font-size:0.52rem; letter-spacing:0.12em; color:var(--ink3); min-width:50px; padding-top:0.1rem; }
-.detail-val { font-size:0.75rem; line-height:1.7; letter-spacing:0.02em; flex:1; }
-.detail-ticket-btn {
-  display:block; margin:0.8rem 1rem 0;
-  padding:0.9rem; background:var(--accent); color:var(--white);
-  text-align:center; font-family:'Syne',sans-serif; font-weight:700;
-  font-size:0.82rem; letter-spacing:0.08em;
-  text-decoration:none; border:none; cursor:pointer;
-  transition:background 0.15s;
-}
-.detail-ticket-btn:active { background:var(--ink); }
+.detail-key { font-family:'Syne Mono',monospace; font-size:0.5rem; letter-spacing:0.12em; color:var(--ink3); min-width:46px; padding-top:0.15rem; }
+.detail-val { font-size:0.73rem; line-height:1.7; letter-spacing:0.02em; flex:1; }
+.detail-ticket-btn { display:block; margin:0.8rem 1rem; padding:0.85rem; background:var(--accent); color:var(--white); text-align:center; font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; letter-spacing:0.08em; text-decoration:none; border:none; cursor:pointer; transition:background 0.15s; }
+.detail-ticket-btn:hover { background:var(--ink); }
+.detail-ticket-btn.disabled { opacity:0.4; pointer-events:none; }
 
-/* ===== FILTER DRAWER ===== */
-.filter-overlay {
-  display:none; position:fixed; inset:0;
-  background:rgba(26,20,16,0.5);
-  z-index:200; backdrop-filter:blur(2px);
-}
-.filter-overlay.open { display:block; }
-.filter-drawer {
-  position:fixed; top:0; right:0; bottom:0;
-  width:min(300px, 90vw);
-  background:var(--white);
-  border-left:2px solid var(--ink);
-  z-index:201;
-  overflow-y:auto;
-  transform:translateX(100%);
-  transition:transform 0.3s cubic-bezier(0.22,1,0.36,1);
-}
-.filter-overlay.open .filter-drawer { transform:translateX(0); }
-.filter-drawer-header {
-  padding:1rem 1rem 0.8rem;
-  background:var(--ink); color:var(--white);
-  display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:1;
-}
-.filter-drawer-header h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:0.9rem; letter-spacing:0.05em; }
-.filter-close-btn {
-  background:none; border:1px solid rgba(255,255,255,0.3);
-  color:var(--white); padding:0.2rem 0.7rem;
-  font-family:'Syne Mono',monospace; font-size:0.65rem; cursor:pointer;
-}
-.filter-section { padding:1rem; border-bottom:1px solid var(--border); }
-.filter-section-label { font-family:'Syne Mono',monospace; font-size:0.52rem; letter-spacing:0.2em; color:var(--ink3); margin-bottom:0.7rem; text-transform:uppercase; }
-.filter-genre-row {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0.5rem 0; border-bottom:1px solid var(--border);
-}
-.filter-genre-row:last-child { border-bottom:none; }
-.filter-genre-label { font-size:0.78rem; display:flex; align-items:center; gap:0.5rem; }
-.toggle-switch {
-  position:relative; width:42px; height:24px; flex-shrink:0;
-}
-.toggle-switch input { display:none; }
-.toggle-track {
-  position:absolute; inset:0; background:var(--border);
-  border-radius:12px; cursor:pointer; transition:background 0.2s;
-}
-.toggle-switch input:checked + .toggle-track { background:var(--accent); }
-.toggle-track::after {
-  content:''; position:absolute; top:3px; left:3px;
-  width:18px; height:18px; border-radius:50%;
-  background:var(--white); transition:left 0.2s;
-}
-.toggle-switch input:checked + .toggle-track::after { left:21px; }
-.venue-filter-row {
-  display:flex; align-items:center; gap:0.5rem;
-  padding:0.4rem 0;
-}
-.venue-filter-label {
-  font-size:0.72rem; color:var(--ink2); flex:1;
-  display:flex; align-items:center; gap:0.4rem;
-}
-.venue-mini-dot { width:5px;height:5px;border-radius:50%;flex-shrink:0; }
-
-/* ===== ADMIN / SETUP (password-protected) ===== */
-.admin-fab {
-  display:none; /* 管理者モードのみ表示 */
-  position:fixed; bottom:calc(1.5rem + var(--safe-bottom)); right:1.2rem;
-  width:48px; height:48px; border-radius:50%;
-  background:var(--accent); color:var(--white);
-  border:none; cursor:pointer; font-size:1.2rem;
-  box-shadow:0 4px 16px rgba(201,74,30,0.4);
-  z-index:150; align-items:center; justify-content:center;
-  transition:background 0.15s;
-}
+/* ===== ADMIN FAB ===== */
+.admin-fab { display:none; position:fixed; bottom:calc(1.5rem + env(safe-area-inset-bottom,0)); right:1.2rem; width:50px; height:50px; border-radius:50%; background:var(--accent); color:var(--white); border:none; cursor:pointer; font-size:1.3rem; box-shadow:0 4px 16px rgba(201,74,30,0.4); z-index:150; align-items:center; justify-content:center; transition:background 0.15s; font-weight:400; }
 .admin-fab.visible { display:flex; }
-.admin-fab:active { background:var(--ink); }
+.admin-fab:hover { background:var(--ink); }
 
-.admin-modal-overlay {
-  display:none; position:fixed; inset:0;
-  background:rgba(26,20,16,0.75); z-index:400;
-  align-items:center; justify-content:center;
-  backdrop-filter:blur(3px);
-}
-.admin-modal-overlay.open { display:flex; }
-.admin-modal {
-  background:var(--white); border:2px solid var(--ink);
-  width:min(560px, 95vw); max-height:90dvh; overflow-y:auto;
-}
-.admin-modal-header {
-  padding:1rem 1.2rem; background:var(--ink); color:var(--white);
-  display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:1;
-}
-.admin-modal-header h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:0.9rem; letter-spacing:0.05em; }
-.admin-modal-close {
-  background:none; border:1px solid rgba(255,255,255,0.3);
-  color:var(--white); padding:0.2rem 0.7rem;
-  font-family:'Syne Mono',monospace; font-size:0.65rem; cursor:pointer;
-}
-.admin-modal-body { padding:1.2rem; }
-.form-section { margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+/* ===== ADMIN MODAL ===== */
+.admin-overlay { display:none; position:fixed; inset:0; background:rgba(26,20,16,0.75); z-index:400; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
+.admin-overlay.open { display:flex; }
+.admin-modal { background:var(--white); border:2px solid var(--ink); width:min(560px,95vw); max-height:90dvh; overflow-y:auto; }
+.admin-modal-hdr { padding:1rem 1.2rem; background:var(--ink); color:var(--white); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:1; }
+.admin-modal-hdr h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:0.9rem; letter-spacing:0.05em; }
+.admin-close-btn { background:none; border:1px solid rgba(255,255,255,0.3); color:var(--white); padding:0.2rem 0.7rem; font-family:'Syne Mono',monospace; font-size:0.65rem; cursor:pointer; }
+.admin-body { padding:1.2rem; }
+.form-section { margin-bottom:1.4rem; padding-bottom:1.4rem; border-bottom:1px solid var(--border); }
 .form-section:last-child { border-bottom:none; margin-bottom:0; }
-.form-section-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.78rem; letter-spacing:0.05em; margin-bottom:0.8rem; color:var(--accent); }
-.form-row { margin-bottom:0.9rem; }
-.form-label { display:block; font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.15em; color:var(--ink3); margin-bottom:0.35rem; text-transform:uppercase; }
-.form-input, .form-select, .form-textarea {
-  width:100%; padding:0.6rem 0.8rem;
-  border:1.5px solid var(--border); background:var(--bg);
-  font-family:'Noto Sans JP',sans-serif; font-size:0.8rem;
-  color:var(--ink); outline:none; appearance:none;
-  border-radius:0; transition:border-color 0.15s;
-  -webkit-appearance: none;
-}
+.form-section-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.78rem; color:var(--accent); margin-bottom:0.8rem; letter-spacing:0.04em; }
+.form-row { margin-bottom:0.85rem; }
+.form-label { display:block; font-family:'Syne Mono',monospace; font-size:0.54rem; letter-spacing:0.14em; color:var(--ink3); margin-bottom:0.35rem; text-transform:uppercase; }
+.form-input,.form-select,.form-textarea { width:100%; padding:0.58rem 0.8rem; border:1.5px solid var(--border); background:var(--bg); font-family:'Noto Sans JP',sans-serif; font-size:0.8rem; color:var(--ink); outline:none; -webkit-appearance:none; appearance:none; border-radius:0; transition:border-color 0.15s; }
 .form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--ink); background:var(--white); }
-.form-textarea { min-height:70px; resize:vertical; }
+.form-textarea { min-height:68px; resize:vertical; }
 .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
 .form-genre-group { display:flex; gap:0.4rem; }
 .form-genre-radio { flex:1; }
 .form-genre-radio input { display:none; }
-.form-genre-radio label {
-  display:flex; align-items:center; justify-content:center;
-  gap:0.2rem; padding:0.5rem 0.3rem;
-  border:1.5px solid var(--border); cursor:pointer;
-  font-size:0.68rem; font-weight:500; transition:all 0.15s;
-  background:var(--bg);
-}
+.form-genre-radio label { display:flex; align-items:center; justify-content:center; gap:0.25rem; padding:0.5rem 0.3rem; border:1.5px solid var(--border); cursor:pointer; font-size:0.68rem; font-weight:500; transition:all 0.15s; background:var(--bg); }
 .form-genre-radio input:checked + label { background:var(--ink); color:var(--white); border-color:var(--ink); }
-.form-submit {
-  width:100%; padding:0.85rem; background:var(--accent); color:var(--white);
-  border:none; font-family:'Syne',sans-serif; font-weight:700;
-  font-size:0.82rem; letter-spacing:0.1em; cursor:pointer;
-  transition:background 0.15s;
-}
-.form-submit:active { background:var(--ink); }
-.form-note { font-size:0.68rem; color:var(--ink3); line-height:1.8; letter-spacing:0.02em; padding:0.7rem 0.8rem; background:var(--bg2); border-left:3px solid var(--accent2); margin-bottom:0.9rem; }
+.form-submit { width:100%; padding:0.85rem; background:var(--accent); color:var(--white); border:none; font-family:'Syne',sans-serif; font-weight:700; font-size:0.82rem; letter-spacing:0.1em; cursor:pointer; transition:background 0.15s; }
+.form-submit:hover { background:var(--ink); }
+.form-note { font-size:0.66rem; color:var(--ink3); line-height:1.8; padding:0.65rem 0.8rem; background:var(--bg2); border-left:3px solid var(--accent2); margin-bottom:0.85rem; }
 .form-note strong { color:var(--accent); }
-
-/* ===== SETUP SECTION (admin only) ===== */
-.setup-section {
-  background:#fff8f0; border:2px solid var(--accent2);
-  padding:1rem; margin-bottom:1.2rem;
-}
-.setup-section h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:0.82rem; color:var(--accent); margin-bottom:0.6rem; }
-.setup-section p { font-size:0.7rem; line-height:1.8; color:var(--ink2); margin-bottom:0.5rem; }
-.setup-section code { background:var(--bg2); padding:0.1rem 0.3rem; font-family:'Syne Mono',monospace; font-size:0.68em; color:var(--accent); }
-.setup-input-row { display:flex; flex-direction:column; gap:0.4rem; margin-top:0.6rem; }
-.setup-input {
-  padding:0.55rem 0.8rem; border:1.5px solid var(--border);
-  background:var(--white); font-size:0.75rem;
-  font-family:'Noto Sans JP',sans-serif; outline:none;
-  border-radius:0; -webkit-appearance:none;
-}
-.setup-save-btn {
-  padding:0.6rem 1rem; background:var(--accent); color:var(--white);
-  border:none; font-family:'Syne Mono',monospace; font-size:0.65rem;
-  letter-spacing:0.1em; cursor:pointer;
-}
-.setup-save-btn:active { background:var(--ink); }
-.setup-url-display {
-  font-family:'Syne Mono',monospace; font-size:0.58rem;
-  color:var(--ink3); margin-top:0.4rem; word-break:break-all;
-  padding:0.4rem 0.6rem; background:var(--bg2); border:1px solid var(--border);
-}
+.setup-url-display { font-family:'Syne Mono',monospace; font-size:0.56rem; color:var(--ink3); margin-top:0.4rem; word-break:break-all; padding:0.4rem 0.6rem; background:var(--bg2); border:1px solid var(--border); }
 
 /* ===== TOAST ===== */
-.toast {
-  position:fixed; bottom:calc(1.5rem + var(--safe-bottom)); left:50%;
-  transform:translateX(-50%) translateY(80px);
-  background:var(--ink); color:var(--white);
-  padding:0.7rem 1.5rem; font-family:'Syne Mono',monospace;
-  font-size:0.65rem; letter-spacing:0.08em;
-  border-left:3px solid var(--accent);
-  transition:transform 0.3s ease; z-index:500;
-  white-space:nowrap; max-width:90vw;
-  overflow:hidden; text-overflow:ellipsis;
-}
+.toast { position:fixed; bottom:calc(1.5rem + env(safe-area-inset-bottom,0)); left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:var(--white); padding:0.7rem 1.5rem; font-family:'Syne Mono',monospace; font-size:0.63rem; letter-spacing:0.08em; border-left:3px solid var(--accent); transition:transform 0.3s ease; z-index:500; white-space:nowrap; max-width:90vw; overflow:hidden; text-overflow:ellipsis; }
 .toast.show { transform:translateX(-50%) translateY(0); }
 
 /* ===== EMPTY ===== */
@@ -568,210 +244,276 @@ body {
 .empty-state h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem; margin-bottom:0.5rem; }
 .empty-state p { font-size:0.72rem; line-height:1.9; }
 
-/* ===== PC (768px以上) ===== */
+/* ==============================
+   PC LAYOUT (768px以上)
+   ============================== */
 @media (min-width: 768px) {
-  .sp-header { height:58px; padding:0 2rem; }
-  .sp-logo { font-size:1.2rem; }
-  .sp-hero { padding:2rem; }
-  .sp-hero-title { font-size:2rem; }
-  .sp-hero-stats { gap:2.5rem; }
-  .sp-stat-num { font-size:2rem; }
-  .area-scroll-btn { padding:0.8rem 1.5rem; font-size:0.8rem; }
+  :root { --header-h-pc: 62px; }
+
+  .site-header { height:var(--header-h-pc); padding:0 2rem; }
+  .header-logo { font-size:1.25rem; }
+  .header-update { display:block; }
+
+  /* Hero: wider */
+  .site-hero { padding:2rem 2.5rem; }
+  .site-hero::before { font-size:18vw; }
+  .hero-title { font-size:2.2rem; }
+  .hero-title em { display:inline; }
+  .hero-meta { gap:2.5rem; }
+  .hero-stat-num { font-size:2rem; }
+  .hero-desc { display:block; margin-top:0.5rem; }
+
+  /* PC: 2-column layout */
+  .body-wrap { display:grid; grid-template-columns:var(--sidebar-w) 1fr; min-height:calc(100vh - var(--header-h-pc) - 120px); }
+
+  /* PC sidebar (filter panel becomes left sidebar) */
+  .sp-filter-section {
+    position:sticky;
+    top:var(--header-h-pc);
+    height:calc(100vh - var(--header-h-pc));
+    overflow-y:auto;
+    border-right:2px solid var(--ink);
+    border-bottom:none;
+    background:var(--white);
+  }
+  .filter-block { padding:1.2rem 1.2rem; }
+  .filter-collapse-btn { display:none; }
+  .filter-block-body { max-height:none !important; }
+  .chip-row { flex-wrap:wrap; gap:0.35rem; }
+  .genre-toggle-row { flex-direction:column; gap:0.3rem; }
+  .genre-chip { justify-content:flex-start; }
+  .venue-chip-scroll { flex-wrap:wrap; gap:0.3rem; }
+  .venue-chip { font-size:0.62rem; }
+
+  /* PC: right column */
+  .cal-column { }
+  .cal-controls { padding:0.8rem 1.5rem; }
+  .month-label { font-size:1.3rem; min-width:130px; }
+  .results-bar { padding:0.5rem 1.5rem; }
+
+  /* PC: calendar cells taller */
   .cal-cell { min-height:90px; }
   .cell-num { font-size:0.75rem; width:22px; height:22px; }
-  .list-date-header { padding:0.7rem 1.5rem 0.5rem; }
-  .filter-drawer { width:320px; }
+
+  /* PC: list date header sticky offset */
+  .list-date-header { top:var(--header-h-pc); }
+
+  /* PC: event cards a bit larger */
+  .ec-time { min-width:58px; padding:0.9rem 0.8rem; font-size:0.85rem; }
+  .ec-title { font-size:0.85rem; }
+
+  /* PC: detail as right panel instead of bottom sheet */
+  .detail-overlay { background:rgba(26,20,16,0.4); }
+  .detail-sheet {
+    position:fixed;
+    top:0; bottom:0; right:0; left:auto;
+    width:380px;
+    max-height:100vh;
+    border-top:none;
+    border-left:2px solid var(--ink);
+    transform:translateX(100%);
+    transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  }
+  .detail-overlay.open .detail-sheet { transform:translateX(0); }
+  .detail-sheet-handle { display:none; }
+
+  /* PC: admin fab position */
+  .admin-fab { bottom:2rem; right:2rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- ローディング -->
+<!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
   <div class="loading-logo">OSAKA <em>LIVE</em></div>
   <div class="loading-bar"></div>
   <div class="loading-text" id="loading-text">読み込み中...</div>
 </div>
 
-<!-- ヘッダー -->
-<header class="sp-header">
-  <div class="sp-logo">OSAKA <em>LIVE</em> GUIDE</div>
-  <button class="sp-refresh-btn" id="refresh-btn" onclick="manualReload()" title="再読込">↻</button>
-  <button class="sp-filter-btn" onclick="openFilter()">絞込 ▾</button>
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-logo">OSAKA <em>LIVE</em> GUIDE</div>
+  <div class="autoupdate-badge">
+    <span class="badge-dot"></span>
+    <span>次回更新 <span id="next-update-time">—</span></span>
+  </div>
+  <div class="header-actions">
+    <button class="hdr-btn" id="refresh-btn" onclick="manualReload()" title="今すぐ更新">↻ 更新</button>
+  </div>
 </header>
 
-<!-- 自動更新バー -->
-<div class="autoupdate-bar">
-  <span><span class="autoupdate-dot"></span>30分ごと自動更新</span>
-  <span>次回更新: <span class="next-update" id="next-update-time">—</span></span>
-</div>
-
-<!-- ヒーロー -->
-<div class="sp-hero">
-  <div class="sp-hero-title">大阪の<em>ライブ情報</em>を<br>ひとまとめに</div>
-  <div class="sp-hero-stats">
-    <div class="sp-stat">
-      <div class="sp-stat-num" id="stat-events">—</div>
-      <div class="sp-stat-label">EVENTS/MONTH</div>
+<!-- HERO -->
+<div class="site-hero">
+  <div class="hero-title">大阪の<em>ライブ情報</em>をひとまとめに</div>
+  <div class="hero-meta">
+    <div>
+      <div class="hero-stat-num" id="stat-events">—</div>
+      <div class="hero-stat-label">EVENTS / MONTH</div>
     </div>
-    <div class="sp-stat">
-      <div class="sp-stat-num">8</div>
-      <div class="sp-stat-label">VENUES</div>
+    <div>
+      <div class="hero-stat-num" id="stat-venues">15</div>
+      <div class="hero-stat-label">VENUES</div>
     </div>
+    <div class="hero-desc">心斎橋・梅田エリアのライブ情報を一元管理。<br>エリア・ジャンル・会場で絞り込めます。</div>
   </div>
 </div>
 
-<!-- エリアタブ -->
-<div class="area-scroll" id="area-scroll">
-  <button class="area-scroll-btn active" data-area="all" onclick="filterArea('all',this)">
-    すべて <span class="area-cnt" id="cnt-all">—</span>
-  </button>
-  <button class="area-scroll-btn" data-area="shinsaibashi" onclick="filterArea('shinsaibashi',this)">
-    <span class="area-dot" style="background:var(--shinsaibashi)"></span>心斎橋
-    <span class="area-cnt" id="cnt-shinsaibashi">—</span>
-  </button>
-  <button class="area-scroll-btn" data-area="umeda" onclick="filterArea('umeda',this)">
-    <span class="area-dot" style="background:var(--umeda)"></span>梅田
-    <span class="area-cnt" id="cnt-umeda">—</span>
-  </button>
-</div>
+<!-- BODY: sidebar + calendar -->
+<div class="body-wrap">
 
-<!-- 月ナビ -->
-<div class="month-nav-bar">
-  <button class="month-nav-btn" onclick="changeMonth(-1)">◀</button>
-  <div class="month-label" id="month-display">—</div>
-  <button class="month-nav-btn" onclick="changeMonth(1)">▶</button>
-</div>
+  <!-- ===== FILTER PANEL (SP: inline / PC: sidebar) ===== -->
+  <div class="sp-filter-section" id="filter-panel">
 
-<!-- ビュー切替 -->
-<div class="view-toggle-bar">
-  <button class="view-toggle-btn active" id="btn-cal" onclick="switchView('cal')">📅 カレンダー</button>
-  <button class="view-toggle-btn" id="btn-list" onclick="switchView('list')">📋 リスト</button>
-</div>
-
-<!-- 件数バー -->
-<div class="results-bar">
-  <span>表示中: <span class="results-count" id="results-count">—</span> 件</span>
-  <span id="filter-summary" style="font-size:0.52rem;">全エリア・全ジャンル</span>
-</div>
-
-<!-- カレンダービュー -->
-<div id="cal-view">
-  <div class="cal-dow-row">
-    <div class="cal-dow sun">日</div>
-    <div class="cal-dow">月</div>
-    <div class="cal-dow">火</div>
-    <div class="cal-dow">水</div>
-    <div class="cal-dow">木</div>
-    <div class="cal-dow">金</div>
-    <div class="cal-dow sat">土</div>
-  </div>
-  <div class="cal-grid" id="cal-grid"></div>
-  <!-- タップ時の日付別イベント一覧 -->
-  <div class="day-events-panel" id="day-events-panel">
-    <div class="day-events-header">
-      <span id="day-events-title">イベント</span>
-      <button class="day-events-close" onclick="closeDayPanel()">✕</button>
+    <!-- エリア -->
+    <div class="filter-block">
+      <div class="filter-block-label">
+        AREA
+        <button class="filter-collapse-btn open" onclick="toggleCollapse(this)">▲</button>
+      </div>
+      <div class="filter-block-body" style="max-height:200px;">
+        <div class="chip-row">
+          <div class="chip active" data-area="all" onclick="filterArea('all',this)">
+            すべて <span class="chip-cnt" id="cnt-all">—</span>
+          </div>
+          <div class="chip area-s active" data-area="shinsaibashi" onclick="filterArea('shinsaibashi',this)">
+            <span class="chip-dot" style="background:var(--shinsaibashi)"></span>心斎橋
+            <span class="chip-cnt" id="cnt-shinsaibashi">—</span>
+          </div>
+          <div class="chip area-u active" data-area="umeda" onclick="filterArea('umeda',this)">
+            <span class="chip-dot" style="background:var(--umeda)"></span>梅田
+            <span class="chip-cnt" id="cnt-umeda">—</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="day-events-list"></div>
+
+    <!-- ジャンル -->
+    <div class="filter-block">
+      <div class="filter-block-label">
+        GENRE
+        <button class="filter-collapse-btn open" onclick="toggleCollapse(this)">▲</button>
+      </div>
+      <div class="filter-block-body" style="max-height:200px;">
+        <div class="genre-toggle-row">
+          <div class="genre-chip idol active" onclick="toggleGenreChip('idol',this)">🎤 アイドル</div>
+          <div class="genre-chip band active" onclick="toggleGenreChip('band',this)">🎸 バンド</div>
+          <div class="genre-chip other active" onclick="toggleGenreChip('other',this)">🎵 その他</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 会場 -->
+    <div class="filter-block">
+      <div class="filter-block-label">
+        VENUE
+        <button class="filter-collapse-btn open" onclick="toggleCollapse(this)">▲</button>
+      </div>
+      <div class="filter-block-body" style="max-height:400px;">
+        <span class="venue-section-label">— 心斎橋エリア</span>
+        <div class="venue-chip-scroll" id="venue-chips-s"></div>
+        <span class="venue-section-label" style="margin-top:0.6rem;">— 梅田エリア</span>
+        <div class="venue-chip-scroll" id="venue-chips-u"></div>
+      </div>
+    </div>
+
   </div>
-</div>
 
-<!-- リストビュー -->
-<div id="list-view"></div>
+  <!-- ===== CALENDAR COLUMN ===== -->
+  <div class="cal-column">
 
-<!-- 詳細ボトムシート -->
-<div class="detail-overlay" id="detail-overlay" onclick="closeDetail(event)">
-  <div class="detail-sheet" id="detail-sheet">
+    <!-- 月ナビ + ビュー切替 -->
+    <div class="cal-controls">
+      <div class="month-nav">
+        <button class="month-btn" onclick="changeMonth(-1)">◀</button>
+        <div class="month-label" id="month-display">—</div>
+        <button class="month-btn" onclick="changeMonth(1)">▶</button>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-cal" onclick="switchView('cal')">📅 カレンダー</button>
+        <button class="view-btn" id="btn-list" onclick="switchView('list')">📋 リスト</button>
+      </div>
+    </div>
+
+    <!-- 件数バー -->
+    <div class="results-bar">
+      <span>表示中: <span class="results-count" id="results-count">—</span> 件</span>
+      <span id="filter-summary" style="font-size:0.5rem;">全エリア・全ジャンル</span>
+    </div>
+
+    <!-- カレンダービュー -->
+    <div id="cal-view">
+      <div class="cal-dow-row">
+        <div class="cal-dow sun">日</div>
+        <div class="cal-dow">月</div>
+        <div class="cal-dow">火</div>
+        <div class="cal-dow">水</div>
+        <div class="cal-dow">木</div>
+        <div class="cal-dow">金</div>
+        <div class="cal-dow sat">土</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="day-panel" id="day-panel">
+        <div class="day-panel-header">
+          <span class="day-panel-title" id="day-panel-title">—</span>
+          <button class="day-panel-close" onclick="closeDayPanel()">✕ 閉じる</button>
+        </div>
+        <div id="day-panel-list"></div>
+      </div>
+    </div>
+
+    <!-- リストビュー -->
+    <div id="list-view"></div>
+
+  </div><!-- /cal-column -->
+</div><!-- /body-wrap -->
+
+<!-- DETAIL (bottom sheet SP / right panel PC) -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetailOutside(event)">
+  <div class="detail-sheet">
     <div class="detail-sheet-handle"></div>
-    <div class="detail-sheet-header">
-      <div class="detail-area-badge" id="d-area-badge"></div>
+    <div class="detail-header">
+      <div class="detail-area-badge" id="d-badge"></div>
       <div class="detail-title" id="d-title"></div>
-      <div class="detail-venue" id="d-venue"></div>
+      <div class="detail-venue-name" id="d-venue"></div>
     </div>
     <div class="detail-body" id="d-body"></div>
     <a class="detail-ticket-btn" id="d-ticket" href="#" target="_blank" rel="noopener">チケット・詳細を確認する →</a>
   </div>
 </div>
 
-<!-- フィルタードロワー -->
-<div class="filter-overlay" id="filter-overlay" onclick="closeFilterOutside(event)">
-  <div class="filter-drawer" id="filter-drawer">
-    <div class="filter-drawer-header">
-      <h2>絞り込み</h2>
-      <button class="filter-close-btn" onclick="closeFilter()">✕ 閉じる</button>
-    </div>
-
-    <div class="filter-section">
-      <div class="filter-section-label">ジャンル</div>
-      <div class="filter-genre-row">
-        <div class="filter-genre-label">🎤 アイドル</div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="toggle-idol" checked onchange="toggleGenre('idol',this)">
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-      <div class="filter-genre-row">
-        <div class="filter-genre-label">🎸 バンド</div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="toggle-band" checked onchange="toggleGenre('band',this)">
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-      <div class="filter-genre-row">
-        <div class="filter-genre-label">🎵 その他</div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="toggle-other" checked onchange="toggleGenre('other',this)">
-          <div class="toggle-track"></div>
-        </label>
-      </div>
-    </div>
-
-    <div class="filter-section">
-      <div class="filter-section-label">会場 — 心斎橋</div>
-      <div id="venue-filter-s"></div>
-    </div>
-    <div class="filter-section">
-      <div class="filter-section-label">会場 — 梅田</div>
-      <div id="venue-filter-u"></div>
-    </div>
-  </div>
-</div>
-
-<!-- 管理者FAB（管理者モード時のみ表示） -->
+<!-- ADMIN FAB -->
 <button class="admin-fab" id="admin-fab" onclick="openAdmin()">＋</button>
 
-<!-- 管理者モーダル -->
-<div class="admin-modal-overlay" id="admin-modal" onclick="closeAdminOutside(event)">
+<!-- ADMIN MODAL -->
+<div class="admin-overlay" id="admin-overlay" onclick="closeAdminOutside(event)">
   <div class="admin-modal">
-    <div class="admin-modal-header">
+    <div class="admin-modal-hdr">
       <h2>⚙ 管理者メニュー</h2>
-      <button class="admin-modal-close" onclick="closeAdmin()">✕ 閉じる</button>
+      <button class="admin-close-btn" onclick="closeAdmin()">✕ 閉じる</button>
     </div>
-    <div class="admin-modal-body">
+    <div class="admin-body">
 
-      <!-- スプレッドシート設定 -->
       <div class="form-section">
         <div class="form-section-title">📊 スプレッドシート設定</div>
-        <div class="setup-section">
-          <h3>データソースURL</h3>
-          <p>Googleスプレッドシートの「ウェブに公開」CSV URLを設定してください。<br>
-          列順: <code>date</code> <code>time</code> <code>title</code> <code>venue</code> <code>genre</code> <code>price</code> <code>acts</code> <code>ticket_url</code></p>
-          <div class="setup-input-row">
-            <input class="setup-input" id="sheet-url-input" type="url"
-              placeholder="https://docs.google.com/spreadsheets/d/XXXX/pub?output=csv">
-            <button class="setup-save-btn" onclick="saveSheetUrl()">保存して読み込む</button>
-          </div>
-          <div class="setup-url-display" id="current-url-display">未設定</div>
+        <div class="form-note">
+          Googleスプレッドシートの「ウェブに公開 → CSV」URLを貼り付けてください。<br>
+          列順: <strong>date / time / title / venue / genre / price / acts / ticket_url</strong>
+        </div>
+        <div class="form-row">
+          <label class="form-label">スプレッドシートURL</label>
+          <input class="form-input" id="sheet-url-input" type="url" placeholder="https://docs.google.com/spreadsheets/d/XXXX/pub?output=csv">
+        </div>
+        <div class="setup-url-display" id="url-display">未設定</div>
+        <div class="form-row" style="margin-top:0.8rem;">
+          <button class="form-submit" onclick="saveSheetUrl()">保存して読み込む</button>
         </div>
       </div>
 
-      <!-- イベント一時追加 -->
       <div class="form-section">
         <div class="form-section-title">＋ イベントを一時追加（確認用）</div>
         <div class="form-note">
-          <strong>注意:</strong> ここでの登録はページをリロードすると消えます。<br>
-          永続保存はスプレッドシートに直接入力してください。
+          <strong>注意:</strong> ここで追加したデータはページリロードで消えます。正式登録はスプレッドシートへ。
         </div>
         <div class="form-row">
           <label class="form-label">タイトル *</label>
@@ -788,36 +530,33 @@ body {
           </div>
         </div>
         <div class="form-row">
-          <label class="form-label">ジャンル *</label>
+          <label class="form-label">ジャンル</label>
           <div class="form-genre-group">
-            <label class="form-genre-radio">
-              <input type="radio" name="genre" value="idol" checked>
-              <label>🎤 アイドル</label>
-            </label>
-            <label class="form-genre-radio">
-              <input type="radio" name="genre" value="band">
-              <label>🎸 バンド</label>
-            </label>
-            <label class="form-genre-radio">
-              <input type="radio" name="genre" value="other">
-              <label>🎵 その他</label>
-            </label>
+            <label class="form-genre-radio"><input type="radio" name="fgenre" value="idol" checked><label>🎤 アイドル</label></label>
+            <label class="form-genre-radio"><input type="radio" name="fgenre" value="band"><label>🎸 バンド</label></label>
+            <label class="form-genre-radio"><input type="radio" name="fgenre" value="other"><label>🎵 その他</label></label>
           </div>
         </div>
         <div class="form-row">
-          <label class="form-label">会場 *</label>
+          <label class="form-label">会場</label>
           <select class="form-select" id="f-venue">
             <optgroup label="心斎橋エリア">
-              <option value="fanj">Fanj Twice</option>
-              <option value="bigcat">BIG CAT</option>
-              <option value="bronze">Shinsaibashi BRONZE</option>
+              <option value="fanj">FanjTwice</option>
+              <option value="bigcat">BIGCAT</option>
               <option value="janus">JANUS</option>
-              <option value="cherryroom">Cherry Room</option>
+              <option value="osakamuse">OSAKA MUSE</option>
+              <option value="drop">心斎橋DROP</option>
+              <option value="beyond">心斎橋BEYOND</option>
+              <option value="sunhall">SUNHALL</option>
+              <option value="joule">CLUB JOULE</option>
+              <option value="anima">ANIMA</option>
+              <option value="numgate">NUMBER GATE</option>
             </optgroup>
             <optgroup label="梅田エリア">
-              <option value="zeela">梅田Zeela</option>
-              <option value="shang">梅田SHANGRI-LA</option>
-              <option value="club4">梅田CLUB 4</option>
+              <option value="banana">バナナホール</option>
+              <option value="amhall">アムホール</option>
+              <option value="zeela">Zeela</option>
+              <option value="bangboo">BANGBOO</option>
             </optgroup>
           </select>
         </div>
@@ -835,7 +574,7 @@ body {
           <label class="form-label">出演者</label>
           <textarea class="form-textarea" id="f-acts" placeholder="出演グループ名など"></textarea>
         </div>
-        <button class="form-submit" onclick="submitEvent()">確認用に追加する</button>
+        <button class="form-submit" onclick="submitEvent()">確認用に追加</button>
       </div>
 
     </div>
@@ -845,35 +584,52 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== 管理者パスワード設定 =====
-// ★ここを自分のパスワードに変更してください★
-const ADMIN_PASSWORD = 'osaka2025admin';
-// アクセス方法: https://あなたのサイト/?admin=osaka2025admin
+// ===== 管理者パスワード =====
+const ADMIN_PASSWORD = 'osaka2025admin'; // ← 変更してください
 
 // ===== 会場マスター =====
 const VENUES = {
-  fanj:       { name:'Fanj Twice',          area:'shinsaibashi', cap:'500' },
-  bigcat:     { name:'BIG CAT',             area:'shinsaibashi', cap:'1000' },
-  bronze:     { name:'Shinsaibashi BRONZE', area:'shinsaibashi', cap:'200' },
-  janus:      { name:'JANUS',               area:'shinsaibashi', cap:'400' },
-  cherryroom: { name:'Cherry Room',         area:'shinsaibashi', cap:'150' },
-  zeela:      { name:'梅田Zeela',           area:'umeda', cap:'300' },
-  shang:      { name:'梅田SHANGRI-LA',      area:'umeda', cap:'700' },
-  club4:      { name:'梅田CLUB 4',          area:'umeda', cap:'250' },
+  // 心斎橋
+  fanj:    { name:'FanjTwice',       area:'shinsaibashi', cap:'500' },
+  bigcat:  { name:'BIGCAT',          area:'shinsaibashi', cap:'1000' },
+  janus:   { name:'JANUS',           area:'shinsaibashi', cap:'400' },
+  osakamuse:{ name:'OSAKA MUSE',     area:'shinsaibashi', cap:'350' },
+  drop:    { name:'心斎橋DROP',       area:'shinsaibashi', cap:'200' },
+  beyond:  { name:'心斎橋BEYOND',     area:'shinsaibashi', cap:'150' },
+  sunhall: { name:'SUNHALL',         area:'shinsaibashi', cap:'300' },
+  joule:   { name:'CLUB JOULE',      area:'shinsaibashi', cap:'250' },
+  anima:   { name:'ANIMA',           area:'shinsaibashi', cap:'150' },
+  numgate: { name:'NUMBER GATE',     area:'shinsaibashi', cap:'100' },
+  // 梅田
+  banana:  { name:'バナナホール',     area:'umeda', cap:'500' },
+  amhall:  { name:'アムホール',       area:'umeda', cap:'300' },
+  zeela:   { name:'Zeela',           area:'umeda', cap:'300' },
+  bangboo: { name:'BANGBOO',         area:'umeda', cap:'200' },
 };
+
+// スプレッドシートvenueキーのaliasマッピング
 const VENUE_ALIASES = {
-  'fanj twice':'fanj','fanjtwice':'fanj','fanj':'fanj',
-  'big cat':'bigcat','bigcat':'bigcat',
-  'bronze':'bronze','shinsaibashi bronze':'bronze',
+  'fanjtwice':'fanj','fanj twice':'fanj','fanj':'fanj',
+  'bigcat':'bigcat','big cat':'bigcat',
   'janus':'janus',
-  'cherry room':'cherryroom','cherryroom':'cherryroom',
+  'osaka muse':'osakamuse','osakamuse':'osakamuse',
+  '心斎橋drop':'drop','drop':'drop',
+  '心斎橋beyond':'beyond','beyond':'beyond',
+  'sunhall':'sunhall',
+  'club joule':'joule','clubjoule':'joule','joule':'joule',
+  'anima':'anima',
+  'number gate':'numgate','numbergate':'numgate','numgate':'numgate',
+  'バナナホール':'banana','banana':'banana',
+  'アムホール':'amhall','amhall':'amhall',
   'zeela':'zeela','梅田zeela':'zeela',
-  'shangri-la':'shang','shangri la':'shang','梅田shangri-la':'shang','shang':'shang',
-  'club 4':'club4','club4':'club4','梅田club 4':'club4',
+  'bangboo':'bangboo',
 };
+
 const GENRE_LABELS = { idol:'アイドル', band:'バンド', other:'その他' };
 const GENRE_COLORS = { idol:'#c94a1e', band:'#2a6e3f', other:'#6e2a8a' };
 const GENRE_ICONS  = { idol:'🎤', band:'🎸', other:'🎵' };
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const DAYS   = ['日','月','火','水','木','金','土'];
 
 // ===== 状態 =====
 let EVENTS = [];
@@ -882,256 +638,232 @@ let activeArea = 'all';
 let activeGenres = new Set(['idol','band','other']);
 let activeVenues = new Set(Object.keys(VENUES));
 let currentView = 'cal';
-let selectedDay = null;
 let autoUpdateTimer = null;
 let nextUpdateAt = null;
 let isAdminMode = false;
 
-// ===== 管理者モード判定 =====
+// ===== 管理者モード =====
 function checkAdminMode() {
-  const params = new URLSearchParams(window.location.search);
-  const pw = params.get('admin');
-  if (pw === ADMIN_PASSWORD) {
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('admin') === ADMIN_PASSWORD) {
     isAdminMode = true;
     document.getElementById('admin-fab').classList.add('visible');
-    // URLからパスワードを消してブックマークしやすくする
-    const cleanUrl = window.location.pathname;
-    window.history.replaceState({}, '', cleanUrl);
+    window.history.replaceState({}, '', window.location.pathname);
   }
 }
 
-// ===== スプレッドシートURL =====
+// ===== Sheet URL =====
 let SHEET_URL = '';
-function getSheetUrl() {
-  try { return localStorage.getItem('osaka_live_sheet_url') || ''; } catch(e) { return SHEET_URL; }
-}
-function setSheetUrl(url) {
-  SHEET_URL = url;
-  try { localStorage.setItem('osaka_live_sheet_url', url); } catch(e) {}
-}
+function getSheetUrl() { try { return localStorage.getItem('olg_sheet_url') || ''; } catch(e) { return SHEET_URL; } }
+function setSheetUrl(u) { SHEET_URL = u; try { localStorage.setItem('olg_sheet_url', u); } catch(e) {} }
 
-// ===== CSV パーサー =====
+// ===== CSV =====
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
-  const events = [];
-  lines.slice(1).forEach((line, i) => {
-    const cols = [];
-    let cur = '', inQ = false;
+  return lines.slice(1).reduce((acc, line, i) => {
+    const cols = []; let cur = '', inQ = false;
     for (const c of line) {
       if (c === '"') { inQ = !inQ; }
       else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-      else { cur += c; }
+      else cur += c;
     }
     cols.push(cur.trim());
-    const [date, time, title, venueRaw, genreRaw, price, acts, ticket] = cols;
-    if (!date || !title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-    const vk = (venueRaw || '').toLowerCase().trim();
+    const [date, time, title, vRaw, gRaw, price, acts, ticket] = cols;
+    if (!date || !title || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) return acc;
+    const vk = (vRaw||'').toLowerCase().trim();
     const venue = VENUE_ALIASES[vk] || vk;
-    if (!VENUES[venue]) return;
-    const gm = { 'アイドル':'idol','idol':'idol','バンド':'band','band':'band','その他':'other','other':'other' };
-    const genre = gm[(genreRaw||'').toLowerCase().trim()] || 'other';
-    events.push({ id:`s${i}`, date:date.trim(), time:(time||'').trim()||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
-  });
-  return events;
+    if (!VENUES[venue]) return acc;
+    const gm = {'アイドル':'idol','idol':'idol','バンド':'band','band':'band','その他':'other','other':'other'};
+    const genre = gm[(gRaw||'').toLowerCase().trim()] || 'other';
+    acc.push({ id:`s${i}`, date:date.trim(), time:(time||'').trim()||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
+    return acc;
+  }, []);
 }
 
-// ===== 読み込み =====
+// ===== Load =====
 async function loadFromSheet(isManual = false) {
-  const url = getSheetUrl();
   const btn = document.getElementById('refresh-btn');
   btn.classList.add('spinning');
-
-  if (!url) {
-    loadSampleData();
-    hideLoading();
-    btn.classList.remove('spinning');
-    scheduleNextUpdate();
-    render();
-    return;
-  }
-
+  const url = getSheetUrl();
+  if (!url) { loadSampleData(); hideLoading(); btn.classList.remove('spinning'); scheduleNext(); render(); return; }
   try {
-    const res = await fetch(url + '&cachebust=' + Date.now());
+    const res = await fetch(url + '&t=' + Date.now());
     if (!res.ok) throw new Error(res.status);
-    const text = await res.text();
-    const prev = EVENTS.length;
-    EVENTS = parseCSV(text);
+    EVENTS = parseCSV(await res.text());
     if (isManual) showToast(`✓ ${EVENTS.length}件 読み込み完了`);
   } catch(e) {
     if (isManual) showToast('⚠ 読み込み失敗。URLを確認してください。');
     if (!EVENTS.length) loadSampleData();
   }
-  hideLoading();
-  btn.classList.remove('spinning');
-  scheduleNextUpdate();
-  render();
+  hideLoading(); btn.classList.remove('spinning'); scheduleNext(); render();
 }
 
 function loadSampleData() {
-  const m = String(curMonth + 1).padStart(2, '0');
-  const y = curYear;
+  const m = String(curMonth+1).padStart(2,'0');
   EVENTS = [
-    { id:'demo1', venue:'fanj',   date:`${y}-${m}-07`, time:'17:00', genre:'idol', title:'【サンプル】アイドルナイト vol.12', price:'¥2,000（+1D）', acts:'グループA / グループB', ticket:'#' },
-    { id:'demo2', venue:'bigcat', date:`${y}-${m}-14`, time:'18:00', genre:'idol', title:'【サンプル】BIG CAT アイドルフェス', price:'¥3,500（+1D）', acts:'複数グループ出演', ticket:'#' },
-    { id:'demo3', venue:'zeela',  date:`${y}-${m}-21`, time:'17:00', genre:'band', title:'【サンプル】OSAKA ROCK NIGHT', price:'¥2,500（+1D）', acts:'バンドA / バンドB', ticket:'#' },
-    { id:'demo4', venue:'janus',  date:`${y}-${m}-28`, time:'18:30', genre:'idol', title:'【サンプル】定期公演', price:'¥2,000（+1D）', acts:'グループC', ticket:'#' },
+    { id:'d1', venue:'fanj',    date:`${curYear}-${m}-05`, time:'17:00', genre:'idol', title:'【サンプル】アイドルナイト vol.12', price:'¥2,000（+1D）', acts:'グループA / グループB', ticket:'#' },
+    { id:'d2', venue:'bigcat',  date:`${curYear}-${m}-12`, time:'18:00', genre:'idol', title:'【サンプル】BIGCAT アイドルフェス', price:'¥3,500（+1D）', acts:'複数グループ出演', ticket:'#' },
+    { id:'d3', venue:'janus',   date:`${curYear}-${m}-12`, time:'19:00', genre:'band', title:'【サンプル】JANUS ROCK NIGHT', price:'¥2,500（+1D）', acts:'バンドA / バンドB', ticket:'#' },
+    { id:'d4', venue:'zeela',   date:`${curYear}-${m}-19`, time:'17:00', genre:'band', title:'【サンプル】梅田バンド対バン', price:'¥2,000（+1D）', acts:'バンドC / バンドD', ticket:'#' },
+    { id:'d5', venue:'drop',    date:`${curYear}-${m}-26`, time:'18:30', genre:'idol', title:'【サンプル】定期公演', price:'¥2,000（+1D）', acts:'グループC', ticket:'#' },
+    { id:'d6', venue:'bangboo', date:`${curYear}-${m}-26`, time:'16:00', genre:'other', title:'【サンプル】ソロナイト', price:'¥1,500（+1D）', acts:'アーティストX', ticket:'#' },
   ];
 }
 
 function manualReload() { loadFromSheet(true); }
 
 // ===== 自動更新（30分） =====
-function scheduleNextUpdate() {
+function scheduleNext() {
   if (autoUpdateTimer) clearTimeout(autoUpdateTimer);
-  const INTERVAL = 30 * 60 * 1000;
-  nextUpdateAt = Date.now() + INTERVAL;
-  autoUpdateTimer = setTimeout(() => loadFromSheet(false), INTERVAL);
-  updateNextUpdateDisplay();
+  const ms = 30 * 60 * 1000;
+  nextUpdateAt = Date.now() + ms;
+  autoUpdateTimer = setTimeout(() => loadFromSheet(false), ms);
+  updateCountdown();
 }
-
-function updateNextUpdateDisplay() {
+function updateCountdown() {
   if (!nextUpdateAt) return;
   const diff = Math.max(0, Math.round((nextUpdateAt - Date.now()) / 60000));
   document.getElementById('next-update-time').textContent = diff + '分後';
-  setTimeout(updateNextUpdateDisplay, 60000);
+  setTimeout(updateCountdown, 60000);
 }
 
-// ===== フィルタ =====
-function toggleGenre(genre, el) {
-  if (el.checked) activeGenres.add(genre);
-  else activeGenres.delete(genre);
-  render();
-}
-
-function filterArea(area, btn) {
+// ===== フィルター =====
+function filterArea(area, el) {
   activeArea = area;
-  document.querySelectorAll('.area-scroll-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  document.querySelectorAll('[data-area]').forEach(c => {
+    if (c.classList.contains('chip')) {
+      c.classList.toggle('active', c.dataset.area === area || (area !== 'all' && c.dataset.area === 'all') === false);
+    }
+  });
+  // all chip always active when all; area chips: only selected active
+  document.querySelectorAll('.chip[data-area]').forEach(c => {
+    if (area === 'all') {
+      c.classList.add('active');
+    } else {
+      c.classList.toggle('active', c.dataset.area === area || c.dataset.area === 'all');
+    }
+  });
   Object.keys(VENUES).forEach(id => {
     if (area === 'all' || VENUES[id].area === area) activeVenues.add(id);
     else activeVenues.delete(id);
   });
-  document.querySelectorAll('.venue-toggle-input').forEach(cb => {
-    cb.checked = activeVenues.has(cb.dataset.venueId);
+  // sync venue chips
+  document.querySelectorAll('.venue-chip').forEach(c => {
+    c.classList.toggle('active', activeVenues.has(c.dataset.venueId));
   });
+  closeDayPanel(); render();
+}
+
+function toggleGenreChip(genre, el) {
+  if (activeGenres.has(genre)) { activeGenres.delete(genre); el.classList.remove('active'); }
+  else { activeGenres.add(genre); el.classList.add('active'); }
   render();
 }
 
-function toggleVenueFilter(id, el) {
-  if (el.checked) activeVenues.add(id);
-  else activeVenues.delete(id);
+function toggleVenueChip(id, el) {
+  if (activeVenues.has(id)) { activeVenues.delete(id); el.classList.remove('active'); }
+  else { activeVenues.add(id); el.classList.add('active'); }
   render();
 }
 
-// ===== フィルタ済みイベント =====
+// collapse (SP only)
+function toggleCollapse(btn) {
+  const body = btn.closest('.filter-block').querySelector('.filter-block-body');
+  const isOpen = btn.classList.contains('open');
+  if (isOpen) {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(() => { body.style.maxHeight = '0'; body.classList.add('collapsed'); });
+    btn.classList.remove('open'); btn.textContent = '▼';
+  } else {
+    body.classList.remove('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    setTimeout(() => { body.style.maxHeight = ''; }, 320);
+    btn.classList.add('open'); btn.textContent = '▲';
+  }
+}
+
+// ===== 絞り込み済みイベント =====
 function getFiltered() {
   return EVENTS.filter(e => {
     const d = new Date(e.date);
-    return d.getFullYear() === curYear && d.getMonth() === curMonth &&
+    return d.getFullYear()===curYear && d.getMonth()===curMonth &&
            activeVenues.has(e.venue) && activeGenres.has(e.genre);
   });
 }
 
 // ===== カウント =====
 function updateCounts() {
-  const allM = EVENTS.filter(e => { const d = new Date(e.date); return d.getFullYear()===curYear && d.getMonth()===curMonth; });
-  document.getElementById('cnt-all').textContent = allM.length;
-  document.getElementById('cnt-shinsaibashi').textContent = allM.filter(e => VENUES[e.venue]?.area==='shinsaibashi').length;
-  document.getElementById('cnt-umeda').textContent = allM.filter(e => VENUES[e.venue]?.area==='umeda').length;
-  document.getElementById('stat-events').textContent = allM.length;
+  const m = EVENTS.filter(e => { const d=new Date(e.date); return d.getFullYear()===curYear && d.getMonth()===curMonth; });
+  document.getElementById('cnt-all').textContent = m.length;
+  document.getElementById('cnt-shinsaibashi').textContent = m.filter(e => VENUES[e.venue]?.area==='shinsaibashi').length;
+  document.getElementById('cnt-umeda').textContent = m.filter(e => VENUES[e.venue]?.area==='umeda').length;
+  document.getElementById('stat-events').textContent = m.length;
 }
 
-// ===== レンダリング =====
+// ===== Render =====
 function render() {
   const filtered = getFiltered();
   document.getElementById('results-count').textContent = filtered.length;
   updateCounts();
-  const areaTxt = activeArea==='all' ? '全エリア' : activeArea==='shinsaibashi' ? '心斎橋' : '梅田';
-  const genreTxt = [...activeGenres].map(g => GENRE_LABELS[g]).join('・') || 'なし';
+  const areaTxt = activeArea==='all'?'全エリア':activeArea==='shinsaibashi'?'心斎橋':'梅田';
+  const genreTxt = [...activeGenres].map(g=>GENRE_LABELS[g]).join('・')||'なし';
   document.getElementById('filter-summary').textContent = `${areaTxt} / ${genreTxt}`;
-  if (currentView === 'cal') renderCal(filtered);
-  else renderList(filtered);
+  currentView==='cal' ? renderCal(filtered) : renderList(filtered);
 }
 
 // ===== カレンダー =====
 function renderCal(filtered) {
   const grid = document.getElementById('cal-grid');
   grid.innerHTML = '';
-  const firstDay = new Date(curYear, curMonth, 1).getDay();
-  const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+  const first = new Date(curYear, curMonth, 1).getDay();
+  const total = new Date(curYear, curMonth+1, 0).getDate();
   const today = new Date();
-
-  for (let i = 0; i < firstDay; i++) {
-    const c = document.createElement('div'); c.className = 'cal-cell other-month'; grid.appendChild(c);
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dow = (firstDay + d - 1) % 7;
+  for (let i=0;i<first;i++) { const c=document.createElement('div'); c.className='cal-cell other-month'; grid.appendChild(c); }
+  for (let d=1;d<=total;d++) {
+    const ds = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = (first+d-1)%7;
     const isToday = today.getFullYear()===curYear && today.getMonth()===curMonth && today.getDate()===d;
-    const dayEvs = filtered.filter(e => e.date === dateStr);
-
+    const evs = filtered.filter(e=>e.date===ds);
     const cell = document.createElement('div');
     cell.className = `cal-cell${dow===0?' sun':dow===6?' sat':''}${isToday?' today':''}`;
-    cell.onclick = () => openDayPanel(dateStr, dayEvs, d, dow);
-
-    const numEl = document.createElement('div'); numEl.className = 'cell-num'; numEl.textContent = d;
-    cell.appendChild(numEl);
-
-    if (dayEvs.length) {
-      const dotsEl = document.createElement('div'); dotsEl.className = 'cell-dots';
-      dayEvs.slice(0, 6).forEach(ev => {
-        const dot = document.createElement('div');
-        dot.className = 'cell-dot';
-        dot.style.background = GENRE_COLORS[ev.genre];
-        dotsEl.appendChild(dot);
-      });
-      cell.appendChild(dotsEl);
-      const cntEl = document.createElement('div'); cntEl.className = 'cell-count';
-      cntEl.textContent = dayEvs.length + '件';
-      cell.appendChild(cntEl);
+    cell.onclick = () => openDayPanel(ds, evs, d, dow);
+    const num = document.createElement('div'); num.className='cell-num'; num.textContent=d; cell.appendChild(num);
+    if (evs.length) {
+      const dots = document.createElement('div'); dots.className='cell-dots';
+      evs.slice(0,6).forEach(ev => { const dot=document.createElement('div'); dot.className='cell-dot'; dot.style.background=GENRE_COLORS[ev.genre]; dots.appendChild(dot); });
+      cell.appendChild(dots);
+      const cnt = document.createElement('div'); cnt.className='cell-count'; cnt.textContent=evs.length+'件'; cell.appendChild(cnt);
     }
     grid.appendChild(cell);
   }
 }
 
-function openDayPanel(dateStr, events, day, dow) {
-  selectedDay = dateStr;
-  const days = ['日','月','火','水','木','金','土'];
-  document.getElementById('day-events-title').textContent =
-    `${curMonth+1}月${day}日（${days[dow]}）— ${events.length}件`;
-  const list = document.getElementById('day-events-list');
+function openDayPanel(ds, evs, d, dow) {
+  document.getElementById('day-panel-title').textContent = `${curMonth+1}月${d}日（${DAYS[dow]}） — ${evs.length}件`;
+  const list = document.getElementById('day-panel-list');
   list.innerHTML = '';
-  if (!events.length) {
-    list.innerHTML = '<div class="empty-state" style="padding:1.5rem;"><p>この日のイベントはありません</p></div>';
-  } else {
-    events.sort((a,b) => a.time.localeCompare(b.time)).forEach(ev => {
-      list.appendChild(makeEventCard(ev));
-    });
-  }
-  document.getElementById('day-events-panel').classList.add('open');
-  document.getElementById('day-events-panel').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  if (!evs.length) { list.innerHTML='<div class="empty-state" style="padding:1.5rem;"><p>この日のイベントはありません</p></div>'; }
+  else evs.sort((a,b)=>a.time.localeCompare(b.time)).forEach(ev=>list.appendChild(makeCard(ev)));
+  document.getElementById('day-panel').classList.add('open');
+  document.getElementById('day-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function closeDayPanel() {
-  document.getElementById('day-events-panel').classList.remove('open');
-}
+function closeDayPanel() { document.getElementById('day-panel').classList.remove('open'); }
 
-// ===== イベントカード作成 =====
-function makeEventCard(ev) {
-  const v = VENUES[ev.venue];
-  if (!v) return document.createTextNode('');
-  const areaClass = v.area==='shinsaibashi' ? 'sp-tag-area-s' : 'sp-tag-area-u';
-  const areaLabel = v.area==='shinsaibashi' ? '心斎橋' : '梅田';
-  const card = document.createElement('div');
-  card.className = 'event-card-sp';
+// ===== カード生成 =====
+function makeCard(ev) {
+  const v = VENUES[ev.venue]; if (!v) return document.createTextNode('');
+  const ac = v.area==='shinsaibashi'?'ev-tag-area-s':'ev-tag-area-u';
+  const al = v.area==='shinsaibashi'?'心斎橋':'梅田';
+  const card = document.createElement('div'); card.className='event-card';
   card.innerHTML = `
     <div class="ec-stripe" style="background:${GENRE_COLORS[ev.genre]}"></div>
     <div class="ec-time">${ev.time}<span>OPEN</span></div>
     <div class="ec-body">
       <div class="ec-tags">
-        <span class="sp-tag sp-tag-${ev.genre}">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</span>
-        <span class="sp-tag ${areaClass}">${areaLabel}</span>
-        <span class="sp-tag sp-tag-venue">${v.name}</span>
+        <span class="ev-tag ev-tag-${ev.genre}">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</span>
+        <span class="ev-tag ${ac}">${al}</span>
+        <span class="ev-tag ev-tag-venue">${v.name}</span>
       </div>
       <div class="ec-title">${ev.title}</div>
       <div class="ec-acts">${ev.acts}</div>
@@ -1143,175 +875,112 @@ function makeEventCard(ev) {
 
 // ===== リストビュー =====
 function renderList(filtered) {
-  const listEl = document.getElementById('list-view');
-  listEl.innerHTML = '';
-  if (!filtered.length) {
-    listEl.innerHTML = '<div class="empty-state"><h3>イベントがありません</h3><p>フィルターを変更してください。</p></div>';
-    return;
-  }
+  const el = document.getElementById('list-view'); el.innerHTML='';
+  if (!filtered.length) { el.innerHTML='<div class="empty-state"><h3>イベントがありません</h3><p>フィルターを変更してください。</p></div>'; return; }
   const byDate = {};
-  filtered.sort((a,b) => a.date.localeCompare(b.date)||a.time.localeCompare(b.time)).forEach(ev => {
-    if (!byDate[ev.date]) byDate[ev.date] = [];
+  filtered.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time)).forEach(ev=>{
+    if (!byDate[ev.date]) byDate[ev.date]=[];
     byDate[ev.date].push(ev);
   });
-  const days = ['日','月','火','水','木','金','土'];
-  Object.entries(byDate).forEach(([date, events]) => {
-    const d = new Date(date);
-    const group = document.createElement('div'); group.className = 'list-date-group';
-    const hdr = document.createElement('div'); hdr.className = 'list-date-header';
-    hdr.innerHTML = `
-      <div class="list-date-num">${d.getDate()}</div>
-      <div class="list-date-meta">${d.getMonth()+1}月 ${days[d.getDay()]}曜日</div>
-      <div class="list-date-cnt">${events.length}件</div>`;
-    group.appendChild(hdr);
-    events.forEach(ev => group.appendChild(makeEventCard(ev)));
-    listEl.appendChild(group);
+  Object.entries(byDate).forEach(([date,evs])=>{
+    const d=new Date(date); const g=document.createElement('div'); g.className='list-date-group';
+    const hdr=document.createElement('div'); hdr.className='list-date-header';
+    hdr.innerHTML=`<div class="list-date-num">${d.getDate()}</div><div class="list-date-meta">${d.getMonth()+1}月 ${DAYS[d.getDay()]}曜日</div><div class="list-date-cnt">${evs.length}件</div>`;
+    g.appendChild(hdr);
+    evs.forEach(ev=>g.appendChild(makeCard(ev)));
+    el.appendChild(g);
   });
 }
 
 // ===== 詳細 =====
 function openDetail(ev) {
-  const v = VENUES[ev.venue]; if (!v) return;
-  const areaLabel = v.area==='shinsaibashi' ? '心斎橋エリア' : '梅田エリア';
-  const areaColor = v.area==='shinsaibashi' ? 'var(--shinsaibashi)' : 'var(--umeda)';
-  const badge = document.getElementById('d-area-badge');
-  badge.textContent = areaLabel; badge.style.borderColor = areaColor; badge.style.color = areaColor;
-  document.getElementById('d-title').textContent = ev.title;
-  document.getElementById('d-venue').textContent = `${v.name} — 収容${v.cap}人`;
-  const d = new Date(ev.date);
-  const days = ['日','月','火','水','木','金','土'];
-  document.getElementById('d-body').innerHTML = `
-    <div class="detail-row"><div class="detail-key">日時</div><div class="detail-val">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${days[d.getDay()]}）<br>開演 ${ev.time}</div></div>
+  const v=VENUES[ev.venue]; if(!v) return;
+  const al=v.area==='shinsaibashi'?'心斎橋エリア':'梅田エリア';
+  const ac=v.area==='shinsaibashi'?'var(--shinsaibashi)':'var(--umeda)';
+  const b=document.getElementById('d-badge'); b.textContent=al; b.style.borderColor=ac; b.style.color=ac;
+  document.getElementById('d-title').textContent=ev.title;
+  document.getElementById('d-venue').textContent=`${v.name} — 収容${v.cap}人`;
+  const d=new Date(ev.date);
+  document.getElementById('d-body').innerHTML=`
+    <div class="detail-row"><div class="detail-key">日時</div><div class="detail-val">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DAYS[d.getDay()]}）<br>開演 ${ev.time}</div></div>
     <div class="detail-row"><div class="detail-key">ジャンル</div><div class="detail-val" style="color:${GENRE_COLORS[ev.genre]};font-weight:500;">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</div></div>
-    <div class="detail-row"><div class="detail-key">会場</div><div class="detail-val">${v.name}<br><span style="color:var(--ink3);font-size:0.68rem;">${areaLabel}</span></div></div>
+    <div class="detail-row"><div class="detail-key">会場</div><div class="detail-val">${v.name}<br><span style="color:var(--ink3);font-size:0.68rem;">${al}</span></div></div>
     <div class="detail-row"><div class="detail-key">料金</div><div class="detail-val">${ev.price}</div></div>
     <div class="detail-row"><div class="detail-key">出演</div><div class="detail-val">${ev.acts}</div></div>`;
-  const tb = document.getElementById('d-ticket');
-  tb.href = ev.ticket && ev.ticket !== '#' ? ev.ticket : '#';
-  tb.style.opacity = ev.ticket && ev.ticket !== '#' ? '1' : '0.5';
+  const tb=document.getElementById('d-ticket');
+  const hasUrl = ev.ticket && ev.ticket!=='#';
+  tb.href=hasUrl?ev.ticket:'#'; tb.className='detail-ticket-btn'+(hasUrl?'':' disabled');
   document.getElementById('detail-overlay').classList.add('open');
 }
-function closeDetail(e) {
-  if (!e || e.target === document.getElementById('detail-overlay')) {
-    document.getElementById('detail-overlay').classList.remove('open');
-  }
-}
-
-// ===== フィルタードロワー =====
-function openFilter() { document.getElementById('filter-overlay').classList.add('open'); }
-function closeFilter() { document.getElementById('filter-overlay').classList.remove('open'); }
-function closeFilterOutside(e) { if (e.target === document.getElementById('filter-overlay')) closeFilter(); }
+function closeDetailOutside(e) { if(e.target===document.getElementById('detail-overlay')) document.getElementById('detail-overlay').classList.remove('open'); }
 
 // ===== 月移動 =====
-function changeMonth(dir) {
-  curMonth += dir;
-  if (curMonth < 0) { curMonth = 11; curYear--; }
-  if (curMonth > 11) { curMonth = 0; curYear++; }
-  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  document.getElementById('month-display').textContent = `${curYear}年 ${months[curMonth]}`;
-  closeDayPanel();
-  render();
+function changeMonth(d) {
+  curMonth+=d; if(curMonth<0){curMonth=11;curYear--;} if(curMonth>11){curMonth=0;curYear++;}
+  document.getElementById('month-display').textContent=`${curYear}年 ${MONTHS[curMonth]}`;
+  closeDayPanel(); render();
 }
 
-// ===== 表示切替 =====
+// ===== View switch =====
 function switchView(v) {
-  currentView = v;
-  document.getElementById('cal-view').style.display = v==='cal' ? '' : 'none';
-  document.getElementById('list-view').style.display = v==='list' ? '' : 'none';
-  document.getElementById('btn-cal').classList.toggle('active', v==='cal');
-  document.getElementById('btn-list').classList.toggle('active', v==='list');
-  closeDayPanel();
-  render();
+  currentView=v;
+  document.getElementById('cal-view').style.display=v==='cal'?'':'none';
+  document.getElementById('list-view').style.display=v==='list'?'':'none';
+  document.getElementById('btn-cal').classList.toggle('active',v==='cal');
+  document.getElementById('btn-list').classList.toggle('active',v==='list');
+  closeDayPanel(); render();
 }
 
-// ===== 管理者モーダル =====
+// ===== Admin =====
 function openAdmin() {
-  // 現在設定中のURLを表示
-  const url = getSheetUrl();
-  document.getElementById('sheet-url-input').value = url;
-  document.getElementById('current-url-display').textContent = url ? '設定済み: ' + url.substring(0, 60) + '...' : '未設定';
-  document.getElementById('admin-modal').classList.add('open');
+  const u=getSheetUrl(); document.getElementById('sheet-url-input').value=u;
+  document.getElementById('url-display').textContent=u?'設定済み: '+u.slice(0,55)+'...':'未設定';
+  document.getElementById('admin-overlay').classList.add('open');
 }
-function closeAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
-function closeAdminOutside(e) { if (e.target === document.getElementById('admin-modal')) closeAdmin(); }
-
+function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
+function closeAdminOutside(e) { if(e.target===document.getElementById('admin-overlay')) closeAdmin(); }
 function saveSheetUrl() {
-  const url = document.getElementById('sheet-url-input').value.trim();
-  if (!url || !url.includes('spreadsheets')) { showToast('⚠ 正しいURLを入力してください'); return; }
-  setSheetUrl(url);
-  document.getElementById('current-url-display').textContent = '設定済み: ' + url.substring(0, 60) + '...';
-  closeAdmin();
-  showLoading('スプレッドシートを読み込み中...');
-  loadFromSheet(true);
+  const u=document.getElementById('sheet-url-input').value.trim();
+  if(!u||!u.includes('spreadsheets')){ showToast('⚠ 正しいURLを入力してください'); return; }
+  setSheetUrl(u); closeAdmin(); showLoading('読み込み中...'); loadFromSheet(true);
 }
-
 function submitEvent() {
-  const title = document.getElementById('f-title').value.trim();
-  const date = document.getElementById('f-date').value;
-  if (!title || !date) { showToast('⚠ タイトルと日付は必須です'); return; }
-  EVENTS.push({
-    id: `m${Date.now()}`,
-    title, date,
-    time: document.getElementById('f-time').value,
-    venue: document.getElementById('f-venue').value,
-    genre: document.querySelector('input[name="genre"]:checked').value,
-    price: document.getElementById('f-price').value || '—',
-    acts: document.getElementById('f-acts').value || '—',
-    ticket: document.getElementById('f-ticket').value || '#',
-  });
-  closeAdmin();
-  render();
-  showToast(`✓ 「${title}」を一時追加しました`);
-  document.getElementById('f-title').value = '';
-  document.getElementById('f-date').value = '';
-  document.getElementById('f-acts').value = '';
+  const title=document.getElementById('f-title').value.trim();
+  const date=document.getElementById('f-date').value;
+  if(!title||!date){ showToast('⚠ タイトルと日付は必須'); return; }
+  EVENTS.push({ id:'m'+Date.now(), title, date, time:document.getElementById('f-time').value, venue:document.getElementById('f-venue').value, genre:document.querySelector('input[name="fgenre"]:checked').value, price:document.getElementById('f-price').value||'—', acts:document.getElementById('f-acts').value||'—', ticket:document.getElementById('f-ticket').value||'#' });
+  closeAdmin(); render(); showToast(`✓ 「${title}」を一時追加しました`);
+  ['f-title','f-date','f-acts','f-ticket','f-price'].forEach(id=>document.getElementById(id).value='');
 }
 
-// ===== 会場フィルターUI構築 =====
-function buildVenueFilters() {
-  ['s','u'].forEach(k => {
-    const area = k==='s' ? 'shinsaibashi' : 'umeda';
-    const el = document.getElementById(`venue-filter-${k}`);
-    el.innerHTML = '';
-    Object.entries(VENUES).filter(([,v]) => v.area===area).forEach(([id, v]) => {
-      const row = document.createElement('div'); row.className = 'venue-filter-row';
-      const color = area==='shinsaibashi' ? 'var(--shinsaibashi)' : 'var(--umeda)';
-      row.innerHTML = `
-        <div class="venue-filter-label">
-          <span class="venue-mini-dot" style="background:${color}"></span>${v.name}
-        </div>
-        <label class="toggle-switch">
-          <input type="checkbox" class="venue-toggle-input" data-venue-id="${id}" checked
-            onchange="toggleVenueFilter('${id}', this)">
-          <div class="toggle-track"></div>
-        </label>`;
-      el.appendChild(row);
+// ===== 会場チップ構築 =====
+function buildVenueChips() {
+  ['s','u'].forEach(k=>{
+    const area=k==='s'?'shinsaibashi':'umeda';
+    const el=document.getElementById(`venue-chips-${k}`); el.innerHTML='';
+    Object.entries(VENUES).filter(([,v])=>v.area===area).forEach(([id,v])=>{
+      const chip=document.createElement('div');
+      chip.className='venue-chip active'; chip.dataset.venueId=id; chip.dataset.area=area;
+      chip.textContent=v.name;
+      chip.onclick=()=>toggleVenueChip(id,chip);
+      el.appendChild(chip);
     });
   });
 }
 
-// ===== ローディング =====
-function showLoading(msg) {
-  document.getElementById('loading-text').textContent = msg || '読み込み中...';
-  document.getElementById('loading-screen').classList.remove('hidden');
-}
-function hideLoading() { document.getElementById('loading-screen').classList.add('hidden'); }
+// ===== Loading =====
+function showLoading(msg){ document.getElementById('loading-text').textContent=msg||'読み込み中...'; document.getElementById('loading-screen').classList.remove('hidden'); }
+function hideLoading(){ document.getElementById('loading-screen').classList.add('hidden'); }
 
-// ===== トースト =====
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
-}
+// ===== Toast =====
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
 
-// ===== 初期化 =====
-(function init() {
+// ===== Init =====
+(function(){
   checkAdminMode();
-  const now = new Date();
-  curYear = now.getFullYear(); curMonth = now.getMonth();
-  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  document.getElementById('month-display').textContent = `${curYear}年 ${months[curMonth]}`;
-  buildVenueFilters();
+  const now=new Date(); curYear=now.getFullYear(); curMonth=now.getMonth();
+  document.getElementById('month-display').textContent=`${curYear}年 ${MONTHS[curMonth]}`;
+  buildVenueChips();
   loadFromSheet(false);
 })();
 </script>
