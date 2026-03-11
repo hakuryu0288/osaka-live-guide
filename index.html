@@ -343,12 +343,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
 <!-- HEADER -->
 <header class="site-header">
   <div class="header-logo">OSAKA <em>LIVE</em> GUIDE</div>
-  <div class="autoupdate-badge">
-    <span class="badge-dot"></span>
-    <span>次回更新 <span id="next-update-time">—</span></span>
-  </div>
   <div class="header-actions">
-    <button class="hdr-btn" id="refresh-btn" onclick="manualReload()" title="今すぐ更新">↻ 更新</button>
   </div>
 </header>
 
@@ -752,10 +747,8 @@ function parseCSV(text) {
 
 // ===== Load =====
 async function loadFromSheet(isManual = false) {
-  const btn = document.getElementById('refresh-btn');
-  btn.classList.add('spinning');
   const url = getSheetUrl();
-  if (!url) { loadSampleData(); hideLoading(); btn.classList.remove('spinning'); scheduleNext(); render(); return; }
+  if (!url) { loadSampleData(); hideLoading(); scheduleNext(); render(); return; }
   try {
     const res = await fetch(url + '&t=' + Date.now());
     if (!res.ok) throw new Error(res.status);
@@ -765,7 +758,7 @@ async function loadFromSheet(isManual = false) {
     if (isManual) showToast('⚠ 読み込み失敗。URLを確認してください。');
     if (!EVENTS.length) loadSampleData();
   }
-  hideLoading(); btn.classList.remove('spinning'); scheduleNext(); render();
+  hideLoading(); scheduleNext(); render();
 }
 
 function loadSampleData() {
@@ -785,16 +778,7 @@ function manualReload() { loadFromSheet(true); }
 // ===== 自動更新（30分） =====
 function scheduleNext() {
   if (autoUpdateTimer) clearTimeout(autoUpdateTimer);
-  const ms = 30 * 60 * 1000;
-  nextUpdateAt = Date.now() + ms;
-  autoUpdateTimer = setTimeout(() => loadFromSheet(false), ms);
-  updateCountdown();
-}
-function updateCountdown() {
-  if (!nextUpdateAt) return;
-  const diff = Math.max(0, Math.round((nextUpdateAt - Date.now()) / 60000));
-  document.getElementById('next-update-time').textContent = diff + '分後';
-  setTimeout(updateCountdown, 60000);
+  autoUpdateTimer = setTimeout(() => loadFromSheet(false), 30 * 60 * 1000);
 }
 
 // ===== フィルター =====
@@ -853,11 +837,11 @@ function toggleCollapse(btn) {
 }
 
 // ===== 絞り込み済みイベント =====
-function getFiltered(allMonths = false) {
+function getFiltered() {
   const q = searchQuery.trim().toLowerCase();
   return EVENTS.filter(e => {
     const d = new Date(e.date);
-    const inMonth = allMonths || (d.getFullYear()===curYear && d.getMonth()===curMonth);
+    const inMonth = d.getFullYear()===curYear && d.getMonth()===curMonth;
     const inVenue = activeVenues.has(e.venue);
     const inGenre = activeGenres.has(e.genre);
     const inSearch = !q || e.acts.toLowerCase().includes(q) || e.title.toLowerCase().includes(q);
@@ -875,14 +859,13 @@ function updateCounts() {
 
 // ===== Render =====
 function render() {
-  const isList = currentView === 'list';
-  const filtered = getFiltered(isList);
+  const filtered = getFiltered();
   document.getElementById('results-count').textContent = filtered.length;
   updateCounts();
   const areaTxt = activeArea==='all'?'全エリア':activeArea==='shinsaibashi'?'心斎橋':'梅田';
   const genreTxt = [...activeGenres].map(g=>GENRE_LABELS[g]).join('・')||'なし';
   document.getElementById('filter-summary').textContent = `${areaTxt} / ${genreTxt}`;
-  isList ? renderList(filtered) : renderCal(filtered);
+  currentView==='list' ? renderList(filtered) : renderCal(filtered);
 }
 
 // ===== カレンダー =====
