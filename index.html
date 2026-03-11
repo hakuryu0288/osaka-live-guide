@@ -486,7 +486,10 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
   <div class="admin-modal">
     <div class="admin-modal-hdr">
       <h2>⚙ 管理者メニュー</h2>
-      <button class="admin-close-btn" onclick="closeAdmin()">✕ 閉じる</button>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="admin-close-btn" style="background:rgba(255,100,100,0.2);border-color:rgba(255,100,100,0.4);" onclick="exitAdminMode()">終了</button>
+        <button class="admin-close-btn" onclick="closeAdmin()">✕ 閉じる</button>
+      </div>
     </div>
     <div class="admin-body">
 
@@ -649,11 +652,38 @@ let isAdminMode = false;
 // ===== 管理者モード =====
 function checkAdminMode() {
   const p = new URLSearchParams(window.location.search);
-  if (p.get('admin') === ADMIN_PASSWORD) {
+  const pw = p.get('admin');
+
+  if (pw === ADMIN_PASSWORD) {
+    // パスワード一致 → sessionStorageに保存してURLをきれいにする
+    try { sessionStorage.setItem('olg_admin', '1'); } catch(e) {}
     isAdminMode = true;
-    document.getElementById('admin-fab').classList.add('visible');
     window.history.replaceState({}, '', window.location.pathname);
+  } else {
+    // sessionStorageに保存済みならそのまま管理者モード継続
+    try {
+      if (sessionStorage.getItem('olg_admin') === '1') isAdminMode = true;
+    } catch(e) {}
   }
+
+  if (isAdminMode) {
+    document.getElementById('admin-fab').classList.add('visible');
+    // ヘッダーに管理者バッジを表示
+    const badge = document.createElement('span');
+    badge.textContent = '⚙ 管理者';
+    badge.style.cssText = 'font-family:"Syne Mono",monospace;font-size:0.52rem;letter-spacing:0.1em;background:var(--accent);color:white;padding:0.2rem 0.5rem;border-radius:2px;cursor:pointer;';
+    badge.title = 'クリックで管理者モード終了';
+    badge.onclick = exitAdminMode;
+    document.querySelector('.header-actions').prepend(badge);
+  }
+}
+
+// 管理者モードを終了する
+function exitAdminMode() {
+  if (!confirm('管理者モードを終了しますか？')) return;
+  try { sessionStorage.removeItem('olg_admin'); } catch(e) {}
+  showToast('管理者モードを終了しました');
+  setTimeout(() => location.reload(), 1500);
 }
 
 // ===== Sheet URL =====
