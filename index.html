@@ -167,8 +167,16 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
 .event-card { display:flex; align-items:stretch; background:var(--white); border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; }
 .event-card:hover { background:var(--bg); }
 .ec-stripe { width:4px; flex-shrink:0; }
-.ec-time { padding:0.8rem 0.6rem; font-family:'Syne',sans-serif; font-weight:700; font-size:0.78rem; color:var(--ink2); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.1rem; background:var(--bg); flex-shrink:0; min-width:48px; border-right:1px solid var(--border); }
-.ec-time span { font-family:'Syne Mono',monospace; font-size:0.44rem; letter-spacing:0.08em; color:var(--ink3); }
+.ec-time-wrap { padding:0.8rem 0.6rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.25rem; background:var(--bg); flex-shrink:0; min-width:52px; border-right:1px solid var(--border); }
+.search-bar   { display:flex; align-items:center; gap:0.4rem; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:0.35rem 0.6rem; margin-bottom:0.6rem; }
+.search-icon  { font-size:0.7rem; flex-shrink:0; }
+.search-input { flex:1; border:none; background:transparent; font-size:0.68rem; color:var(--ink1); outline:none; min-width:0; }
+.search-input::placeholder { color:var(--ink3); }
+.search-clear { background:none; border:none; cursor:pointer; font-size:0.65rem; color:var(--ink3); padding:0 0.1rem; display:none; }
+.search-clear.visible { display:block; }
+.ec-time-row  { display:flex; flex-direction:column; align-items:center; }
+.ec-time-label{ font-family:'Syne Mono',monospace; font-size:0.38rem; letter-spacing:0.08em; color:var(--ink3); font-weight:600; }
+.ec-time-val  { font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:700; color:var(--ink2); line-height:1.1; }
 .ec-body { padding:0.65rem 0.8rem; flex:1; min-width:0; }
 .ec-tags { display:flex; gap:0.25rem; flex-wrap:wrap; margin-bottom:0.3rem; }
 .ev-tag { font-family:'Syne Mono',monospace; font-size:0.48rem; letter-spacing:0.06em; padding:0.1rem 0.35rem; border:1px solid; }
@@ -299,7 +307,8 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
   .list-date-header { top:var(--header-h-pc); }
 
   /* PC: event cards a bit larger */
-  .ec-time { min-width:58px; padding:0.9rem 0.8rem; font-size:0.85rem; }
+  .ec-time-wrap { min-width:58px; padding:0.9rem 0.8rem; }
+  .ec-time-val  { font-size:0.85rem; }
   .ec-title { font-size:0.85rem; }
 
   /* PC: detail as right panel instead of bottom sheet */
@@ -437,6 +446,13 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
       <span id="filter-summary" style="font-size:0.5rem;">全エリア・全ジャンル</span>
     </div>
 
+    <!-- acts検索ボックス -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="acts-search" type="text" placeholder="出演者・タイトルで検索（部分一致）" oninput="onSearchInput(this.value)">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()" title="クリア">✕</button>
+    </div>
+
     <!-- カレンダービュー -->
     <div id="cal-view">
       <div class="cal-dow-row">
@@ -498,7 +514,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
         <div class="form-section-title" style="font-size:0.9rem;">📊 スプレッドシート設定</div>
         <div class="form-note" style="margin-bottom:0.8rem;">
           GoogleスプレッドシートをCSVで公開したURLを貼り付けてください。<br>
-          <strong>列順:</strong> date / time / title / venue / genre / price / acts / ticket_url<br>
+          <strong>列順:</strong> date / open(オープン) / time(開演) / title / venue / genre / price / acts / ticket_url<br>
           （1行目はヘッダー行）
         </div>
         <div class="form-row">
@@ -532,7 +548,11 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
             <input class="form-input" id="f-date" type="date">
           </div>
           <div class="form-row">
-            <label class="form-label">開演</label>
+            <label class="form-label">OPEN</label>
+            <input class="form-input" id="f-open" type="time">
+          </div>
+          <div class="form-row">
+            <label class="form-label">START</label>
             <input class="form-input" id="f-time" type="time" value="18:00">
           </div>
         </div>
@@ -648,6 +668,20 @@ let currentView = 'cal';
 let autoUpdateTimer = null;
 let nextUpdateAt = null;
 let isAdminMode = false;
+let searchQuery = '';
+
+// ===== 検索 =====
+function onSearchInput(val) {
+  searchQuery = val;
+  document.getElementById('search-clear').classList.toggle('visible', val.length > 0);
+  render();
+}
+function clearSearch() {
+  searchQuery = '';
+  document.getElementById('acts-search').value = '';
+  document.getElementById('search-clear').classList.remove('visible');
+  render();
+}
 
 // ===== 管理者モード =====
 function checkAdminMode() {
@@ -703,14 +737,15 @@ function parseCSV(text) {
       else cur += c;
     }
     cols.push(cur.trim());
-    const [date, time, title, vRaw, gRaw, price, acts, ticket] = cols;
+    const [date, open, time, title, vRaw, gRaw, price, acts, ticket] = cols;
+    // 列構成: A:date B:open(オープン) C:time(開演) D:title E:venue F:genre G:price H:acts I:ticket_url
     if (!date || !title || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) return acc;
     const vk = (vRaw||'').toLowerCase().trim();
     const venue = VENUE_ALIASES[vk] || vk;
     if (!VENUES[venue]) return acc;
     const gm = {'アイドル':'idol','idol':'idol','バンド':'band','band':'band','その他':'other','other':'other'};
     const genre = gm[(gRaw||'').toLowerCase().trim()] || 'other';
-    acc.push({ id:`s${i}`, date:date.trim(), time:(time||'').trim()||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
+    acc.push({ id:`s${i}`, date:date.trim(), open:(open||'').trim()||'', time:(time||'').trim()||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
     return acc;
   }, []);
 }
@@ -736,12 +771,12 @@ async function loadFromSheet(isManual = false) {
 function loadSampleData() {
   const m = String(curMonth+1).padStart(2,'0');
   EVENTS = [
-    { id:'d1', venue:'fanj',    date:`${curYear}-${m}-05`, time:'17:00', genre:'idol', title:'【サンプル】アイドルナイト vol.12', price:'¥2,000（+1D）', acts:'グループA / グループB', ticket:'#' },
-    { id:'d2', venue:'bigcat',  date:`${curYear}-${m}-12`, time:'18:00', genre:'idol', title:'【サンプル】BIGCAT アイドルフェス', price:'¥3,500（+1D）', acts:'複数グループ出演', ticket:'#' },
-    { id:'d3', venue:'janus',   date:`${curYear}-${m}-12`, time:'19:00', genre:'band', title:'【サンプル】JANUS ROCK NIGHT', price:'¥2,500（+1D）', acts:'バンドA / バンドB', ticket:'#' },
-    { id:'d4', venue:'zeela',   date:`${curYear}-${m}-19`, time:'17:00', genre:'band', title:'【サンプル】梅田バンド対バン', price:'¥2,000（+1D）', acts:'バンドC / バンドD', ticket:'#' },
-    { id:'d5', venue:'drop',    date:`${curYear}-${m}-26`, time:'18:30', genre:'idol', title:'【サンプル】定期公演', price:'¥2,000（+1D）', acts:'グループC', ticket:'#' },
-    { id:'d6', venue:'bangboo', date:`${curYear}-${m}-26`, time:'16:00', genre:'other', title:'【サンプル】ソロナイト', price:'¥1,500（+1D）', acts:'アーティストX', ticket:'#' },
+    { id:'d1', venue:'fanj',    date:`${curYear}-${m}-05`, open:'16:30', time:'17:00', genre:'idol', title:'【サンプル】アイドルナイト vol.12', price:'¥2,000（+1D）', acts:'グループA / グループB', ticket:'#' },
+    { id:'d2', venue:'bigcat',  date:`${curYear}-${m}-12`, open:'17:30', time:'18:00', genre:'idol', title:'【サンプル】BIGCAT アイドルフェス', price:'¥3,500（+1D）', acts:'複数グループ出演', ticket:'#' },
+    { id:'d3', venue:'janus',   date:`${curYear}-${m}-12`, open:'18:30', time:'19:00', genre:'band', title:'【サンプル】JANUS ROCK NIGHT', price:'¥2,500（+1D）', acts:'バンドA / バンドB', ticket:'#' },
+    { id:'d4', venue:'zeela',   date:`${curYear}-${m}-19`, open:'16:30', time:'17:00', genre:'band', title:'【サンプル】梅田バンド対バン', price:'¥2,000（+1D）', acts:'バンドC / バンドD', ticket:'#' },
+    { id:'d5', venue:'drop',    date:`${curYear}-${m}-26`, open:'18:00', time:'18:30', genre:'idol', title:'【サンプル】定期公演', price:'¥2,000（+1D）', acts:'グループC', ticket:'#' },
+    { id:'d6', venue:'bangboo', date:`${curYear}-${m}-26`, open:'',      time:'16:00', genre:'other', title:'【サンプル】ソロナイト', price:'¥1,500（+1D）', acts:'アーティストX', ticket:'#' },
   ];
 }
 
@@ -818,11 +853,15 @@ function toggleCollapse(btn) {
 }
 
 // ===== 絞り込み済みイベント =====
-function getFiltered() {
+function getFiltered(allMonths = false) {
+  const q = searchQuery.trim().toLowerCase();
   return EVENTS.filter(e => {
     const d = new Date(e.date);
-    return d.getFullYear()===curYear && d.getMonth()===curMonth &&
-           activeVenues.has(e.venue) && activeGenres.has(e.genre);
+    const inMonth = allMonths || (d.getFullYear()===curYear && d.getMonth()===curMonth);
+    const inVenue = activeVenues.has(e.venue);
+    const inGenre = activeGenres.has(e.genre);
+    const inSearch = !q || e.acts.toLowerCase().includes(q) || e.title.toLowerCase().includes(q);
+    return inMonth && inVenue && inGenre && inSearch;
   });
 }
 
@@ -836,13 +875,14 @@ function updateCounts() {
 
 // ===== Render =====
 function render() {
-  const filtered = getFiltered();
+  const isList = currentView === 'list';
+  const filtered = getFiltered(isList);
   document.getElementById('results-count').textContent = filtered.length;
   updateCounts();
   const areaTxt = activeArea==='all'?'全エリア':activeArea==='shinsaibashi'?'心斎橋':'梅田';
   const genreTxt = [...activeGenres].map(g=>GENRE_LABELS[g]).join('・')||'なし';
   document.getElementById('filter-summary').textContent = `${areaTxt} / ${genreTxt}`;
-  currentView==='cal' ? renderCal(filtered) : renderList(filtered);
+  isList ? renderList(filtered) : renderCal(filtered);
 }
 
 // ===== カレンダー =====
@@ -889,9 +929,16 @@ function makeCard(ev) {
   const ac = v.area==='shinsaibashi'?'ev-tag-area-s':'ev-tag-area-u';
   const al = v.area==='shinsaibashi'?'心斎橋':'梅田';
   const card = document.createElement('div'); card.className='event-card';
+  // オープン・開演の表示を組み立て
+  const timeHtml = ev.open
+    ? `<div class="ec-time-wrap">
+        <div class="ec-time-row"><span class="ec-time-label">OPEN</span><span class="ec-time-val">${ev.open}</span></div>
+        <div class="ec-time-row"><span class="ec-time-label">START</span><span class="ec-time-val">${ev.time}</span></div>
+       </div>`
+    : `<div class="ec-time-wrap"><div class="ec-time-row"><span class="ec-time-label">START</span><span class="ec-time-val">${ev.time}</span></div></div>`;
   card.innerHTML = `
     <div class="ec-stripe" style="background:${GENRE_COLORS[ev.genre]}"></div>
-    <div class="ec-time">${ev.time}<span>OPEN</span></div>
+    ${timeHtml}
     <div class="ec-body">
       <div class="ec-tags">
         <span class="ev-tag ev-tag-${ev.genre}">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</span>
@@ -935,7 +982,7 @@ function openDetail(ev) {
   document.getElementById('d-venue').textContent=`${v.name} — 収容${v.cap}人`;
   const d=new Date(ev.date);
   document.getElementById('d-body').innerHTML=`
-    <div class="detail-row"><div class="detail-key">日時</div><div class="detail-val">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DAYS[d.getDay()]}）<br>開演 ${ev.time}</div></div>
+    <div class="detail-row"><div class="detail-key">日時</div><div class="detail-val">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${DAYS[d.getDay()]}）<br>${ev.open ? `OPEN ${ev.open} / ` : ''}START ${ev.time}</div></div>
     <div class="detail-row"><div class="detail-key">ジャンル</div><div class="detail-val" style="color:${GENRE_COLORS[ev.genre]};font-weight:500;">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</div></div>
     <div class="detail-row"><div class="detail-key">会場</div><div class="detail-val">${v.name}<br><span style="color:var(--ink3);font-size:0.68rem;">${al}</span></div></div>
     <div class="detail-row"><div class="detail-key">料金</div><div class="detail-val">${ev.price}</div></div>
@@ -989,9 +1036,9 @@ function submitEvent() {
   const title=document.getElementById('f-title').value.trim();
   const date=document.getElementById('f-date').value;
   if(!title||!date){ showToast('⚠ タイトルと日付は必須'); return; }
-  EVENTS.push({ id:'m'+Date.now(), title, date, time:document.getElementById('f-time').value, venue:document.getElementById('f-venue').value, genre:document.querySelector('input[name="fgenre"]:checked').value, price:document.getElementById('f-price').value||'—', acts:document.getElementById('f-acts').value||'—', ticket:document.getElementById('f-ticket').value||'#' });
+  EVENTS.push({ id:'m'+Date.now(), title, date, open:document.getElementById('f-open').value||'', time:document.getElementById('f-time').value, venue:document.getElementById('f-venue').value, genre:document.querySelector('input[name="fgenre"]:checked').value, price:document.getElementById('f-price').value||'—', acts:document.getElementById('f-acts').value||'—', ticket:document.getElementById('f-ticket').value||'#' });
   closeAdmin(); render(); showToast(`✓ 「${title}」を一時追加しました`);
-  ['f-title','f-date','f-acts','f-ticket','f-price'].forEach(id=>document.getElementById(id).value='');
+  ['f-title','f-date','f-open','f-acts','f-ticket','f-price'].forEach(id=>document.getElementById(id).value='');
 }
 
 // ===== 会場チップ構築 =====
