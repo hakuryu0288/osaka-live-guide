@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSAKA LIVE GUIDE — 大阪ライブ情報まとめ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+/* ===== 前回と同じスタイル（省略なし） ===== */
+:root {
+  --bg: #f2ede8;
+  --bg2: #e8e2db;
+  --ink: #1a1410;
+  --ink2: #4a3f35;
+  --ink3: #8a7a6e;
+  --accent: #c94a1e;
+  --accent2: #e8761e;
+  --shinsaibashi: #c94a1e;
+  --umeda: #1e6ac9;
+  --idol: #c94a1e;
+  --band: #2a6e3f;
+  --other: #6e2a8a;
+  --border: #d0c8be;
+  --white: #faf7f4;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-serif; min-height:100vh; }
+body::after { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity:0.03; pointer-events:none; z-index:9999; }
+
+/* TOPBAR */
+.topbar { background:var(--ink); color:var(--bg); padding:0.4rem 2rem; display:flex; align-items:center; justify-content:space-between; font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.15em; }
+.topbar-live { display:flex; align-items:center; gap:0.5rem; color:var(--accent2); }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--accent2); animation:blink 1.4s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* HEADER */
+header { background:var(--white); border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:100; }
+.header-inner { display:flex; align-items:stretch; }
+.logo-block { padding:1.2rem 2rem; border-right:2px solid var(--ink); flex-shrink:0; }
+.logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; letter-spacing:-0.02em; line-height:1; }
+.logo em { color:var(--accent); font-style:normal; }
+.logo-sub { font-family:'Syne Mono',monospace; font-size:0.52rem; letter-spacing:0.2em; color:var(--ink3); margin-top:0.2rem; }
+.header-nav { display:flex; align-items:stretch; flex:1; }
+.nav-item { padding:0 1.8rem; font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.1em; color:var(--ink3); border:none; background:none; cursor:pointer; border-right:1px solid var(--border); transition:all 0.15s; text-transform:uppercase; display:flex; align-items:center; gap:0.5rem; }
+.nav-item:hover { background:var(--bg); color:var(--ink); }
+.nav-item.active { background:var(--ink); color:var(--white); }
+.nav-area-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.header-right { margin-left:auto; padding:0 2rem; display:flex; align-items:center; gap:0.8rem; border-left:1px solid var(--border); }
+.admin-btn { font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; padding:0.4rem 1rem; background:var(--accent); color:var(--white); border:none; cursor:pointer; transition:background 0.15s; white-space:nowrap; }
+.admin-btn:hover { background:var(--ink); }
+.reload-btn { font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; padding:0.4rem 0.8rem; background:none; color:var(--ink3); border:1px solid var(--border); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+.reload-btn:hover { background:var(--ink); color:var(--white); border-color:var(--ink); }
+
+/* HERO */
+.hero-strip { background:var(--ink); color:var(--white); padding:3rem 2rem; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center; border-bottom:2px solid var(--accent); position:relative; overflow:hidden; }
+.hero-strip::before { content:'OSAKA'; font-family:'Syne',sans-serif; font-weight:800; font-size:18vw; position:absolute; right:-2vw; top:50%; transform:translateY(-50%); color:transparent; -webkit-text-stroke:1px rgba(255,255,255,0.05); pointer-events:none; line-height:1; }
+.hero-title { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.8rem,4vw,3rem); line-height:1.1; letter-spacing:-0.02em; }
+.hero-title em { color:var(--accent2); font-style:normal; display:block; }
+.hero-desc { margin-top:0.8rem; font-size:0.75rem; font-weight:300; line-height:2; color:rgba(255,255,255,0.5); letter-spacing:0.05em; }
+.hero-stats { display:flex; flex-direction:column; gap:1rem; text-align:right; flex-shrink:0; }
+.stat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:2.5rem; line-height:1; color:var(--accent2); }
+.stat-label { font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.2em; color:rgba(255,255,255,0.4); }
+
+/* LOADING */
+.loading-screen { position:fixed; inset:0; background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:500; transition:opacity 0.4s; }
+.loading-screen.hidden { opacity:0; pointer-events:none; }
+.loading-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:2rem; letter-spacing:-0.02em; margin-bottom:1.5rem; }
+.loading-logo em { color:var(--accent); font-style:normal; }
+.loading-bar { width:200px; height:2px; background:var(--border); position:relative; overflow:hidden; }
+.loading-bar::after { content:''; position:absolute; left:-50%; width:50%; height:100%; background:var(--accent); animation:loading 1s ease infinite; }
+@keyframes loading { 0%{left:-50%} 100%{left:100%} }
+.loading-text { margin-top:1rem; font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--ink3); }
+
+/* SETUP BANNER */
+.setup-banner { background:#fff8f0; border:2px solid var(--accent2); padding:1.5rem 2rem; margin:1.5rem; border-radius:0; display:none; }
+.setup-banner.show { display:block; }
+.setup-banner h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem; color:var(--accent); margin-bottom:0.8rem; letter-spacing:0.05em; }
+.setup-banner p { font-size:0.75rem; line-height:1.9; color:var(--ink2); letter-spacing:0.03em; margin-bottom:0.5rem; }
+.setup-banner code { background:var(--bg2); padding:0.15rem 0.4rem; font-family:'Syne Mono',monospace; font-size:0.7em; color:var(--accent); }
+.setup-input-row { display:flex; gap:0.5rem; margin-top:1rem; }
+.setup-input { flex:1; padding:0.5rem 0.8rem; border:1.5px solid var(--border); background:var(--white); font-size:0.75rem; font-family:'Noto Sans JP',sans-serif; outline:none; }
+.setup-input:focus { border-color:var(--ink); }
+.setup-save-btn { padding:0.5rem 1.2rem; background:var(--accent); color:var(--white); border:none; font-family:'Syne Mono',monospace; font-size:0.65rem; letter-spacing:0.1em; cursor:pointer; }
+.setup-save-btn:hover { background:var(--ink); }
+
+/* MAIN LAYOUT */
+.main-layout { display:grid; grid-template-columns:280px 1fr; min-height:calc(100vh - 200px); }
+
+/* SIDEBAR */
+.sidebar { background:var(--white); border-right:2px solid var(--ink); position:sticky; top:57px; height:calc(100vh - 57px); overflow-y:auto; }
+.sidebar-section { border-bottom:1px solid var(--border); padding:1.5rem; }
+.sidebar-label { font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.25em; color:var(--ink3); margin-bottom:1rem; text-transform:uppercase; }
+.area-tabs { display:flex; flex-direction:column; gap:2px; }
+.area-tab { display:flex; align-items:center; gap:0.7rem; padding:0.7rem 0.8rem; border:1px solid transparent; background:none; cursor:pointer; font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; letter-spacing:0.05em; color:var(--ink2); transition:all 0.15s; text-align:left; }
+.area-tab:hover { background:var(--bg); border-color:var(--border); }
+.area-tab.active { background:var(--ink); color:var(--white); border-color:var(--ink); }
+.area-color { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+.area-count { margin-left:auto; font-family:'Syne Mono',monospace; font-size:0.6rem; opacity:0.5; }
+.genre-filters { display:flex; flex-direction:column; gap:2px; }
+.genre-btn { display:flex; align-items:center; gap:0.7rem; padding:0.5rem 0.8rem; border:1px solid var(--border); background:var(--bg); cursor:pointer; font-size:0.72rem; font-weight:400; color:var(--ink2); transition:all 0.15s; letter-spacing:0.04em; }
+.genre-btn:hover { border-color:var(--ink2); }
+.genre-btn.active { background:var(--white); border-color:var(--ink); font-weight:500; }
+.genre-icon { font-size:0.85rem; }
+.genre-check { margin-left:auto; width:14px; height:14px; border:1.5px solid var(--border); border-radius:2px; display:flex; align-items:center; justify-content:center; font-size:0.6rem; flex-shrink:0; }
+.genre-btn.active .genre-check { background:var(--ink); border-color:var(--ink); color:var(--white); }
+.venue-list { display:flex; flex-direction:column; gap:2px; }
+.venue-btn { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0.6rem; border:none; background:none; cursor:pointer; font-size:0.68rem; color:var(--ink3); transition:color 0.15s; text-align:left; letter-spacing:0.02em; width:100%; }
+.venue-btn:hover { color:var(--ink); }
+.venue-btn.active { color:var(--accent); font-weight:500; }
+.venue-dot { width:5px; height:5px; border-radius:50%; background:var(--border); flex-shrink:0; transition:background 0.15s; }
+.venue-btn.active .venue-dot { background:var(--accent); }
+.venue-cap { margin-left:auto; font-family:'Syne Mono',monospace; font-size:0.55rem; opacity:0.5; }
+
+/* CAL MAIN */
+.cal-main { padding:2rem; background:var(--bg); }
+.view-controls { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; gap:1rem; flex-wrap:wrap; }
+.view-left { display:flex; align-items:center; gap:1rem; }
+.month-nav { display:flex; align-items:center; gap:0.5rem; }
+.month-btn { width:32px; height:32px; border:1.5px solid var(--ink); background:var(--white); cursor:pointer; font-size:0.8rem; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.month-btn:hover { background:var(--ink); color:var(--white); }
+.month-display { font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; letter-spacing:-0.02em; min-width:140px; text-align:center; }
+.view-toggle { display:flex; border:1.5px solid var(--ink); overflow:hidden; }
+.view-btn { padding:0.4rem 0.9rem; border:none; background:var(--white); cursor:pointer; font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--ink3); border-right:1px solid var(--border); transition:all 0.15s; }
+.view-btn:last-child { border-right:none; }
+.view-btn.active { background:var(--ink); color:var(--white); }
+.view-btn:hover:not(.active) { background:var(--bg2); }
+.results-bar { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 1rem; background:var(--white); border:1.5px solid var(--ink); margin-bottom:1.5rem; font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; color:var(--ink3); }
+.results-count { font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem; color:var(--accent); letter-spacing:0; }
+
+/* CALENDAR */
+#cal-view { background:var(--white); border:1.5px solid var(--ink); }
+.cal-header-row { display:grid; grid-template-columns:repeat(7,1fr); background:var(--ink); }
+.cal-header-cell { padding:0.6rem; text-align:center; font-family:'Syne Mono',monospace; font-size:0.58rem; letter-spacing:0.15em; color:rgba(255,255,255,0.5); }
+.cal-header-cell.sun { color:#e8865e; }
+.cal-header-cell.sat { color:#6ea8e8; }
+.cal-body { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--border); }
+.cal-cell { background:var(--white); min-height:90px; padding:0.4rem; cursor:pointer; transition:background 0.1s; position:relative; }
+.cal-cell:hover { background:var(--bg); }
+.cal-cell.other-month { background:var(--bg2); opacity:0.5; }
+.cal-cell.today { background:#fff8f5; }
+.cal-cell.selected { background:#fff0eb; outline:2px solid var(--accent); outline-offset:-2px; }
+.cell-num { font-family:'Syne',sans-serif; font-weight:700; font-size:0.75rem; color:var(--ink3); width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
+.cal-cell.today .cell-num { background:var(--accent); color:var(--white); border-radius:50%; }
+.cal-cell.sun .cell-num { color:#c94a1e88; }
+.cal-cell.sat .cell-num { color:#1e6ac988; }
+.cell-events { margin-top:2px; display:flex; flex-direction:column; gap:1px; }
+.cell-event-pill { font-size:0.52rem; padding:1px 4px; border-left:2px solid; color:var(--ink); background:rgba(0,0,0,0.04); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.6; letter-spacing:0; cursor:pointer; }
+.cell-event-pill:hover { background:rgba(0,0,0,0.08); }
+.cell-more { font-family:'Syne Mono',monospace; font-size:0.5rem; color:var(--ink3); padding:1px 4px; letter-spacing:0.05em; }
+
+/* LIST VIEW */
+#list-view { display:none; }
+.list-date-group { margin-bottom:0.5rem; }
+.list-date-header { display:flex; align-items:center; gap:1rem; padding:0.5rem 0; margin-bottom:0.3rem; }
+.list-date-num { font-family:'Syne',sans-serif; font-weight:800; font-size:1.8rem; line-height:1; min-width:48px; letter-spacing:-0.02em; }
+.list-date-meta { font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.15em; color:var(--ink3); }
+.list-date-line { flex:1; height:1px; background:var(--border); }
+.event-card { background:var(--white); border:1.5px solid var(--border); margin-bottom:3px; display:grid; grid-template-columns:6px auto 1fr auto; align-items:stretch; cursor:pointer; transition:all 0.15s; overflow:hidden; }
+.event-card:hover { border-color:var(--ink); transform:translateX(3px); }
+.event-card-time { padding:0.9rem 1rem; font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; color:var(--ink2); border-right:1px solid var(--border); min-width:60px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0.1rem; background:var(--bg); }
+.event-card-time span { font-family:'Syne Mono',monospace; font-size:0.5rem; font-weight:400; letter-spacing:0.1em; color:var(--ink3); }
+.event-card-body { padding:0.8rem 1rem; flex:1; }
+.event-card-tags { display:flex; gap:0.3rem; margin-bottom:0.4rem; flex-wrap:wrap; }
+.tag { font-family:'Syne Mono',monospace; font-size:0.52rem; letter-spacing:0.1em; padding:0.15rem 0.4rem; border:1px solid; }
+.tag-idol { border-color:var(--idol); color:var(--idol); }
+.tag-band { border-color:var(--band); color:var(--band); }
+.tag-other { border-color:var(--other); color:var(--other); }
+.tag-venue { border-color:var(--border); color:var(--ink3); }
+.tag-area-s { border-color:var(--shinsaibashi); color:var(--shinsaibashi); background:rgba(201,74,30,0.05); }
+.tag-area-u { border-color:var(--umeda); color:var(--umeda); background:rgba(30,106,201,0.05); }
+.event-card-title { font-size:0.85rem; font-weight:500; line-height:1.5; letter-spacing:0.02em; margin-bottom:0.3rem; }
+.event-card-detail { font-size:0.65rem; color:var(--ink3); letter-spacing:0.04em; }
+.event-card-right { padding:0.8rem 1rem; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:0.5rem; border-left:1px solid var(--border); min-width:80px; }
+.ticket-btn { font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.1em; padding:0.3rem 0.6rem; background:var(--ink); color:var(--white); border:none; cursor:pointer; white-space:nowrap; }
+.ticket-btn:hover { background:var(--accent); }
+.event-card-price { font-family:'Syne Mono',monospace; font-size:0.58rem; color:var(--ink3); letter-spacing:0.05em; }
+
+/* DETAIL PANEL */
+.detail-panel { position:fixed; right:0; top:0; bottom:0; width:380px; background:var(--white); border-left:2px solid var(--ink); z-index:200; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.22,1,0.36,1); overflow-y:auto; display:flex; flex-direction:column; }
+.detail-panel.open { transform:translateX(0); }
+.detail-header { padding:1.5rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--white); z-index:1; }
+.detail-close { font-family:'Syne Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; border:1px solid var(--border); background:none; padding:0.3rem 0.8rem; cursor:pointer; float:right; margin-left:1rem; color:var(--ink3); }
+.detail-close:hover { background:var(--ink); color:var(--white); border-color:var(--ink); }
+.detail-area-badge { font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.2em; padding:0.15rem 0.5rem; border:1px solid; display:inline-block; margin-bottom:0.8rem; }
+.detail-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem; line-height:1.2; letter-spacing:-0.01em; margin-bottom:0.5rem; }
+.detail-venue { font-size:0.72rem; color:var(--ink3); letter-spacing:0.05em; }
+.detail-body { padding:1.5rem; flex:1; }
+.detail-row { display:flex; gap:1rem; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+.detail-row:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.detail-key { font-family:'Syne Mono',monospace; font-size:0.55rem; letter-spacing:0.15em; color:var(--ink3); min-width:60px; padding-top:0.1rem; }
+.detail-val { font-size:0.75rem; line-height:1.7; letter-spacing:0.03em; flex:1; }
+.detail-ticket-btn { display:block; margin:1.5rem; padding:0.9rem; background:var(--accent); color:var(--white); text-align:center; font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; letter-spacing:0.1em; border:none; cursor:pointer; transition:background 0.15s; text-decoration:none; }
+.detail-ticket-btn:hover { background:var(--ink); }
+
+/* ADMIN MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,20,16,0.7); z-index:300; align-items:center; justify-content:center; backdrop-filter:blur(2px); }
+.modal-overlay.open { display:flex; }
+.admin-modal { background:var(--white); border:2px solid var(--ink); width:600px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+.modal-header { padding:1.5rem 2rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:var(--ink); color:var(--white); }
+.modal-header h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; letter-spacing:0.05em; }
+.modal-close2 { background:none; border:1px solid rgba(255,255,255,0.3); color:var(--white); padding:0.2rem 0.7rem; cursor:pointer; font-family:'Syne Mono',monospace; font-size:0.7rem; }
+.modal-close2:hover { background:rgba(255,255,255,0.1); }
+.modal-body { padding:2rem; }
+.form-row { margin-bottom:1.2rem; }
+.form-label { display:block; font-family:'Syne Mono',monospace; font-size:0.58rem; letter-spacing:0.15em; color:var(--ink3); margin-bottom:0.4rem; text-transform:uppercase; }
+.form-input,.form-select,.form-textarea { width:100%; padding:0.6rem 0.8rem; border:1.5px solid var(--border); background:var(--bg); font-family:'Noto Sans JP',sans-serif; font-size:0.8rem; color:var(--ink); transition:border-color 0.15s; outline:none; appearance:none; }
+.form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--ink); background:var(--white); }
+.form-textarea { min-height:80px; resize:vertical; }
+.form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.form-genre-group { display:flex; gap:0.5rem; }
+.genre-radio { flex:1; }
+.genre-radio input { display:none; }
+.genre-radio label { display:flex; align-items:center; justify-content:center; gap:0.3rem; padding:0.5rem; border:1.5px solid var(--border); cursor:pointer; font-size:0.7rem; font-weight:500; transition:all 0.15s; background:var(--bg); }
+.genre-radio input:checked + label { background:var(--ink); color:var(--white); border-color:var(--ink); }
+.form-submit { width:100%; padding:0.9rem; background:var(--accent); color:var(--white); border:none; font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; letter-spacing:0.1em; cursor:pointer; transition:background 0.15s; margin-top:0.5rem; }
+.form-submit:hover { background:var(--ink); }
+.form-note { font-size:0.68rem; color:var(--ink3); line-height:1.8; letter-spacing:0.03em; padding:0.8rem; background:var(--bg2); border-left:3px solid var(--accent2); margin-bottom:1.2rem; }
+.form-note strong { color:var(--accent); font-weight:500; }
+
+/* TOAST */
+.toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(80px); background:var(--ink); color:var(--white); padding:0.8rem 2rem; font-family:'Syne Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; border-left:3px solid var(--accent); transition:transform 0.3s ease; z-index:400; white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* EMPTY STATE */
+.empty-state { padding:4rem 2rem; text-align:center; color:var(--ink3); }
+.empty-state h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:0.5rem; letter-spacing:0.05em; }
+.empty-state p { font-size:0.75rem; line-height:1.9; letter-spacing:0.03em; }
+
+@media (max-width:900px) {
+  .main-layout { grid-template-columns:1fr; }
+  .sidebar { position:static; height:auto; overflow:visible; border-right:none; border-bottom:2px solid var(--ink); }
+  .hero-strip::before { display:none; }
+  .detail-panel { width:100%; }
+  .form-row-2 { grid-template-columns:1fr; }
+  header .header-nav { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ローディング画面 -->
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-logo">OSAKA <em>LIVE</em> GUIDE</div>
+  <div class="loading-bar"></div>
+  <div class="loading-text" id="loading-text">データを読み込み中...</div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span>OSAKA LIVE GUIDE — 大阪ライブ情報まとめ</span>
+  <div class="topbar-live">
+    <div class="live-dot"></div>
+    <span id="last-updated">読み込み中...</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo">OSAKA<br><em>LIVE</em> GUIDE</div>
+      <div class="logo-sub">大阪ライブ情報まとめ</div>
+    </div>
+    <div class="header-nav">
+      <button class="nav-item active" onclick="setAreaHeader('all',this)">ALL AREA</button>
+      <button class="nav-item" onclick="setAreaHeader('shinsaibashi',this)">
+        <span class="nav-area-dot" style="background:var(--shinsaibashi)"></span>心斎橋
+      </button>
+      <button class="nav-item" onclick="setAreaHeader('umeda',this)">
+        <span class="nav-area-dot" style="background:var(--umeda)"></span>梅田
+      </button>
+    </div>
+    <div class="header-right">
+      <button class="reload-btn" onclick="loadFromSheet()" title="スプレッドシートから再読み込み">↻ 再読込</button>
+      <button class="admin-btn" onclick="openAdmin()">＋ イベント登録</button>
+    </div>
+  </div>
+</header>
+
+<!-- SETUP BANNER（スプレッドシートURL未設定時に表示） -->
+<div class="setup-banner" id="setup-banner">
+  <h3>⚙ スプレッドシートを設定してください</h3>
+  <p>
+    Googleスプレッドシートを作成し、「ウェブに公開」でCSV形式のURLを取得してください。<br>
+    列の順番: <code>A:date</code> <code>B:time</code> <code>C:title</code> <code>D:venue</code>
+    <code>E:genre</code> <code>F:price</code> <code>G:acts</code> <code>H:ticket_url</code><br>
+    1行目はヘッダー行（<code>date,time,title,venue,genre,price,acts,ticket_url</code>）にしてください。
+  </p>
+  <div class="setup-input-row">
+    <input class="setup-input" id="sheet-url-input" type="url"
+      placeholder="https://docs.google.com/spreadsheets/d/XXXX/pub?output=csv">
+    <button class="setup-save-btn" onclick="saveSheetUrl()">保存して読み込む</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero-strip">
+  <div>
+    <h1 class="hero-title">大阪の<em>ライブ情報</em>を<br>ひとまとめに</h1>
+    <p class="hero-desc">心斎橋・梅田エリアのライブハウス情報を一元管理。<br>ジャンル・エリア・会場で絞り込めます。</p>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num" id="stat-events">—</div>
+      <div class="stat-label">EVENTS / MONTH</div>
+    </div>
+    <div>
+      <div class="stat-num" id="stat-venues">8</div>
+      <div class="stat-label">VENUES</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">AREA</div>
+      <div class="area-tabs">
+        <button class="area-tab active" onclick="filterArea('all',this)">
+          <span class="area-color" style="background:var(--ink)"></span>全エリア
+          <span class="area-count" id="cnt-all">—</span>
+        </button>
+        <button class="area-tab" onclick="filterArea('shinsaibashi',this)">
+          <span class="area-color" style="background:var(--shinsaibashi)"></span>心斎橋エリア
+          <span class="area-count" id="cnt-shinsaibashi">—</span>
+        </button>
+        <button class="area-tab" onclick="filterArea('umeda',this)">
+          <span class="area-color" style="background:var(--umeda)"></span>梅田エリア
+          <span class="area-count" id="cnt-umeda">—</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">GENRE</div>
+      <div class="genre-filters">
+        <button class="genre-btn active" onclick="toggleGenre('idol',this)">
+          <span class="genre-icon">🎤</span>アイドル<span class="genre-check">✓</span>
+        </button>
+        <button class="genre-btn active" onclick="toggleGenre('band',this)">
+          <span class="genre-icon">🎸</span>バンド<span class="genre-check">✓</span>
+        </button>
+        <button class="genre-btn active" onclick="toggleGenre('other',this)">
+          <span class="genre-icon">🎵</span>その他<span class="genre-check">✓</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">VENUE — 心斎橋</div>
+      <div class="venue-list" id="venue-list-s"></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">VENUE — 梅田</div>
+      <div class="venue-list" id="venue-list-u"></div>
+    </div>
+  </aside>
+
+  <main class="cal-main">
+    <div class="view-controls">
+      <div class="view-left">
+        <div class="month-nav">
+          <button class="month-btn" onclick="changeMonth(-1)">◀</button>
+          <div class="month-display" id="month-display">—</div>
+          <button class="month-btn" onclick="changeMonth(1)">▶</button>
+        </div>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-cal" onclick="switchView('cal')">カレンダー</button>
+        <button class="view-btn" id="btn-list" onclick="switchView('list')">リスト</button>
+      </div>
+    </div>
+    <div class="results-bar">
+      <span>表示中: <span class="results-count" id="results-count">—</span> 件</span>
+      <span id="filter-summary">全エリア・全ジャンル</span>
+    </div>
+    <div id="cal-view">
+      <div class="cal-header-row">
+        <div class="cal-header-cell sun">SUN</div>
+        <div class="cal-header-cell">MON</div>
+        <div class="cal-header-cell">TUE</div>
+        <div class="cal-header-cell">WED</div>
+        <div class="cal-header-cell">THU</div>
+        <div class="cal-header-cell">FRI</div>
+        <div class="cal-header-cell sat">SAT</div>
+      </div>
+      <div class="cal-body" id="cal-body"></div>
+    </div>
+    <div id="list-view"></div>
+  </main>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <button class="detail-close" onclick="closeDetail()">✕ 閉じる</button>
+    <div class="detail-area-badge" id="d-area-badge"></div>
+    <div class="detail-title" id="d-title"></div>
+    <div class="detail-venue" id="d-venue"></div>
+  </div>
+  <div class="detail-body" id="d-body"></div>
+  <a class="detail-ticket-btn" id="d-ticket" href="#" target="_blank" rel="noopener">チケット・詳細を確認する →</a>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="admin-modal" onclick="closeAdminOutside(event)">
+  <div class="admin-modal">
+    <div class="modal-header">
+      <h2>＋ イベント登録</h2>
+      <button class="modal-close2" onclick="closeAdmin()">✕ 閉じる</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-note">
+        <strong>📋 スプレッドシート連動モード:</strong>
+        ここで登録したデータは一時表示のみです。
+        永続保存するには Googleスプレッドシートに直接入力してください。
+        スプレッドシートに追加後、ページ上部の「↻ 再読込」ボタンで反映されます。
+      </div>
+      <div class="form-row">
+        <label class="form-label">イベントタイトル *</label>
+        <input class="form-input" id="f-title" type="text" placeholder="例: アイドルナイト vol.12">
+      </div>
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">日付 *</label>
+          <input class="form-input" id="f-date" type="date">
+        </div>
+        <div class="form-row">
+          <label class="form-label">開演時間</label>
+          <input class="form-input" id="f-time" type="time" value="18:00">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">ジャンル *</label>
+        <div class="form-genre-group">
+          <label class="genre-radio">
+            <input type="radio" name="genre" value="idol" checked>
+            <label>🎤 アイドル</label>
+          </label>
+          <label class="genre-radio">
+            <input type="radio" name="genre" value="band">
+            <label>🎸 バンド</label>
+          </label>
+          <label class="genre-radio">
+            <input type="radio" name="genre" value="other">
+            <label>🎵 その他</label>
+          </label>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">会場 *</label>
+        <select class="form-select" id="f-venue">
+          <optgroup label="心斎橋エリア">
+            <option value="fanj">Fanj Twice</option>
+            <option value="bigcat">BIG CAT</option>
+            <option value="bronze">Shinsaibashi BRONZE</option>
+            <option value="janus">JANUS</option>
+            <option value="cherryroom">Cherry Room</option>
+          </optgroup>
+          <optgroup label="梅田エリア">
+            <option value="zeela">梅田Zeela</option>
+            <option value="shang">梅田SHANGRI-LA</option>
+            <option value="club4">梅田CLUB 4</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">料金</label>
+          <input class="form-input" id="f-price" type="text" placeholder="例: ¥2,500（+1D）">
+        </div>
+        <div class="form-row">
+          <label class="form-label">チケットURL</label>
+          <input class="form-input" id="f-ticket" type="url" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">出演者・詳細</label>
+        <textarea class="form-textarea" id="f-detail" placeholder="出演グループ・アーティスト名など"></textarea>
+      </div>
+      <button class="form-submit" onclick="submitEvent()">一時的に追加して確認する</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 会場マスターデータ =====
+const VENUES = {
+  fanj:       { name:'Fanj Twice',          area:'shinsaibashi', cap:'500' },
+  bigcat:     { name:'BIG CAT',             area:'shinsaibashi', cap:'1000' },
+  bronze:     { name:'Shinsaibashi BRONZE', area:'shinsaibashi', cap:'200' },
+  janus:      { name:'JANUS',               area:'shinsaibashi', cap:'400' },
+  cherryroom: { name:'Cherry Room',         area:'shinsaibashi', cap:'150' },
+  zeela:      { name:'梅田Zeela',           area:'umeda', cap:'300' },
+  shang:      { name:'梅田SHANGRI-LA',      area:'umeda', cap:'700' },
+  club4:      { name:'梅田CLUB 4',          area:'umeda', cap:'250' },
+};
+
+const GENRE_LABELS = { idol:'アイドル', band:'バンド', other:'その他' };
+const GENRE_COLORS = { idol:'#c94a1e', band:'#2a6e3f', other:'#6e2a8a' };
+const GENRE_ICONS  = { idol:'🎤', band:'🎸', other:'🎵' };
+
+// スプレッドシートのvenueキーに対応するマッピング
+// スプレッドシートに「fanj」「bigcat」などと入力する
+const VENUE_ALIASES = {
+  'fanj twice': 'fanj', 'fanjtwice': 'fanj',
+  'big cat': 'bigcat', 'bigcat': 'bigcat',
+  'bronze': 'bronze', 'shinsaibashi bronze': 'bronze',
+  'janus': 'janus',
+  'cherry room': 'cherryroom', 'cherryroom': 'cherryroom',
+  'zeela': 'zeela', '梅田zeela': 'zeela',
+  'shangri-la': 'shang', 'shangri la': 'shang', '梅田shangri-la': 'shang',
+  'club 4': 'club4', 'club4': 'club4', '梅田club 4': 'club4',
+};
+
+// ===== 状態管理 =====
+let EVENTS = [];
+let curYear, curMonth;
+let activeArea = 'all';
+let activeGenres = new Set(['idol','band','other']);
+let activeVenues = new Set(Object.keys(VENUES));
+let currentView = 'cal';
+let selectedEventId = null;
+
+// ===== スプレッドシートURL管理 =====
+// localStorageが使えない環境向けにインメモリでも保持
+let SHEET_URL = '';
+
+function getSheetUrl() {
+  try { return localStorage.getItem('osaka_live_sheet_url') || ''; }
+  catch(e) { return SHEET_URL; }
+}
+function setSheetUrl(url) {
+  SHEET_URL = url;
+  try { localStorage.setItem('osaka_live_sheet_url', url); } catch(e) {}
+}
+
+// ===== CSV パーサー =====
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  // ヘッダー行をスキップ
+  const rows = lines.slice(1);
+  const events = [];
+  rows.forEach((line, i) => {
+    // CSVの簡易パース（ダブルクォート対応）
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let c of line) {
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else { cur += c; }
+    }
+    cols.push(cur.trim());
+
+    const [date, time, title, venueRaw, genreRaw, price, acts, ticket] = cols;
+    if (!date || !title) return;
+
+    // 日付バリデーション
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+
+    // venue解決
+    const venueKey = (venueRaw || '').toLowerCase().trim();
+    const venue = VENUE_ALIASES[venueKey] || venueKey;
+    if (!VENUES[venue]) return; // 未知の会場はスキップ
+
+    // genre解決
+    const genreMap = { 'アイドル':'idol', 'idol':'idol', 'バンド':'band', 'band':'band', 'その他':'other', 'other':'other' };
+    const genre = genreMap[(genreRaw||'').toLowerCase().trim()] || 'other';
+
+    events.push({
+      id: `sheet_${i}`,
+      date: date.trim(),
+      time: (time || '').trim() || '—',
+      title: (title || '').trim(),
+      venue,
+      genre,
+      price: (price || '').trim() || '—',
+      acts: (acts || '').trim() || '—',
+      ticket: (ticket || '').trim() || '#',
+    });
+  });
+  return events;
+}
+
+// ===== スプレッドシートから読み込み =====
+async function loadFromSheet() {
+  const url = getSheetUrl();
+  if (!url) {
+    document.getElementById('setup-banner').classList.add('show');
+    hideLoading();
+    // サンプルデータをロード
+    loadSampleData();
+    return;
+  }
+
+  showLoading('スプレッドシートを読み込み中...');
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    EVENTS = parseCSV(text);
+    document.getElementById('last-updated').textContent =
+      '最終更新: ' + new Date().toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('setup-banner').classList.remove('show');
+    showToast(`✓ ${EVENTS.length}件のイベントを読み込みました`);
+  } catch(e) {
+    console.error(e);
+    showToast('⚠ 読み込みに失敗しました。URLを確認してください。');
+    loadSampleData();
+  }
+  hideLoading();
+  render();
+}
+
+function loadSampleData() {
+  // スプレッドシート未設定時のサンプルデータ
+  EVENTS = [
+    { id:'s1', venue:'fanj',   date:`${curYear}-${String(curMonth+1).padStart(2,'0')}-07`, time:'17:00', genre:'idol',  title:'【サンプル】アイドルナイト vol.12', price:'¥2,000（+1D）', acts:'サンプルグループA / サンプルグループB', ticket:'#' },
+    { id:'s2', venue:'bigcat', date:`${curYear}-${String(curMonth+1).padStart(2,'0')}-14`, time:'18:00', genre:'idol',  title:'【サンプル】BIG CAT アイドルフェス', price:'¥3,500（+1D）', acts:'複数グループ出演', ticket:'#' },
+    { id:'s3', venue:'zeela',  date:`${curYear}-${String(curMonth+1).padStart(2,'0')}-21`, time:'17:00', genre:'band',  title:'【サンプル】OSAKA ROCK NIGHT', price:'¥2,500（+1D）', acts:'バンドA / バンドB', ticket:'#' },
+    { id:'s4', venue:'janus',  date:`${curYear}-${String(curMonth+1).padStart(2,'0')}-28`, time:'18:30', genre:'idol',  title:'【サンプル】定期公演', price:'¥2,000（+1D）', acts:'グループC', ticket:'#' },
+  ];
+  document.getElementById('last-updated').textContent = 'サンプルデータ表示中';
+}
+
+function saveSheetUrl() {
+  const url = document.getElementById('sheet-url-input').value.trim();
+  if (!url || !url.includes('spreadsheets')) {
+    showToast('⚠ 正しいGoogleスプレッドシートのURLを入力してください');
+    return;
+  }
+  setSheetUrl(url);
+  loadFromSheet();
+}
+
+function showLoading(msg) {
+  document.getElementById('loading-text').textContent = msg || '読み込み中...';
+  document.getElementById('loading-screen').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loading-screen').classList.add('hidden');
+}
+
+// ===== 会場リスト構築 =====
+function buildVenueLists() {
+  ['s','u'].forEach(k => {
+    const area = k === 's' ? 'shinsaibashi' : 'umeda';
+    const el = document.getElementById(`venue-list-${k}`);
+    el.innerHTML = '';
+    Object.entries(VENUES).filter(([,v]) => v.area === area).forEach(([id, v]) => {
+      const btn = document.createElement('button');
+      btn.className = 'venue-btn active';
+      btn.dataset.venueId = id;
+      btn.innerHTML = `<span class="venue-dot"></span>${v.name}<span class="venue-cap">${v.cap}人</span>`;
+      btn.onclick = () => toggleVenue(id, btn);
+      el.appendChild(btn);
+    });
+  });
+}
+
+// ===== フィルター処理 =====
+function toggleVenue(id, btn) {
+  if (activeVenues.has(id)) { activeVenues.delete(id); btn.classList.remove('active'); }
+  else { activeVenues.add(id); btn.classList.add('active'); }
+  render();
+}
+
+function toggleGenre(genre, btn) {
+  if (activeGenres.has(genre)) {
+    activeGenres.delete(genre); btn.classList.remove('active');
+    btn.querySelector('.genre-check').textContent = '';
+  } else {
+    activeGenres.add(genre); btn.classList.add('active');
+    btn.querySelector('.genre-check').textContent = '✓';
+  }
+  render();
+}
+
+function filterArea(area, btn) {
+  activeArea = area;
+  document.querySelectorAll('.area-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  Object.keys(VENUES).forEach(id => {
+    if (area === 'all' || VENUES[id].area === area) activeVenues.add(id);
+    else activeVenues.delete(id);
+  });
+  document.querySelectorAll('.venue-btn').forEach(b => {
+    b.classList.toggle('active', activeVenues.has(b.dataset.venueId));
+  });
+  render();
+}
+
+function setAreaHeader(area, btn) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const sideBtn = [...document.querySelectorAll('.area-tab')].find(b => b.onclick?.toString().includes(`'${area}'`));
+  if (sideBtn) filterArea(area, sideBtn);
+  else { activeArea = area; render(); }
+}
+
+// ===== フィルタ済みイベント取得 =====
+function getFiltered() {
+  return EVENTS.filter(e => {
+    const d = new Date(e.date);
+    if (d.getFullYear() !== curYear || d.getMonth() !== curMonth) return false;
+    if (!activeVenues.has(e.venue)) return false;
+    if (!activeGenres.has(e.genre)) return false;
+    return true;
+  });
+}
+
+// ===== カウント更新 =====
+function updateCounts() {
+  const allM = EVENTS.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === curYear && d.getMonth() === curMonth;
+  });
+  document.getElementById('cnt-all').textContent = allM.length;
+  document.getElementById('cnt-shinsaibashi').textContent = allM.filter(e => VENUES[e.venue]?.area === 'shinsaibashi').length;
+  document.getElementById('cnt-umeda').textContent = allM.filter(e => VENUES[e.venue]?.area === 'umeda').length;
+  document.getElementById('stat-events').textContent = allM.length;
+}
+
+// ===== レンダリング =====
+function render() {
+  const filtered = getFiltered();
+  document.getElementById('results-count').textContent = filtered.length;
+  updateCounts();
+  const areaTxt = activeArea === 'all' ? '全エリア' : activeArea === 'shinsaibashi' ? '心斎橋' : '梅田';
+  const genreTxt = [...activeGenres].map(g => GENRE_LABELS[g]).join('・') || 'なし';
+  document.getElementById('filter-summary').textContent = `${areaTxt} / ${genreTxt}`;
+  if (currentView === 'cal') renderCal(filtered);
+  else renderList(filtered);
+}
+
+function renderCal(filtered) {
+  const body = document.getElementById('cal-body');
+  body.innerHTML = '';
+  const firstDay = new Date(curYear, curMonth, 1).getDay();
+  const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
+  const today = new Date();
+
+  for (let i = 0; i < firstDay; i++) {
+    const c = document.createElement('div'); c.className = 'cal-cell other-month'; body.appendChild(c);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${curYear}-${String(curMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = (firstDay + d - 1) % 7;
+    const isToday = today.getFullYear()===curYear && today.getMonth()===curMonth && today.getDate()===d;
+    const dayEvents = filtered.filter(e => e.date === dateStr);
+    const cell = document.createElement('div');
+    cell.className = `cal-cell${dow===0?' sun':dow===6?' sat':''}${isToday?' today':''}`;
+    const numEl = document.createElement('div'); numEl.className = 'cell-num'; numEl.textContent = d;
+    cell.appendChild(numEl);
+    const evC = document.createElement('div'); evC.className = 'cell-events';
+    dayEvents.slice(0,3).forEach(ev => {
+      const pill = document.createElement('div');
+      pill.className = 'cell-event-pill';
+      pill.style.borderColor = GENRE_COLORS[ev.genre];
+      pill.title = ev.title;
+      pill.textContent = ev.title;
+      pill.onclick = e => { e.stopPropagation(); openDetail(ev); };
+      evC.appendChild(pill);
+    });
+    if (dayEvents.length > 3) {
+      const more = document.createElement('div'); more.className = 'cell-more';
+      more.textContent = `+${dayEvents.length - 3} more`; evC.appendChild(more);
+    }
+    cell.appendChild(evC);
+    body.appendChild(cell);
+  }
+}
+
+function renderList(filtered) {
+  const listEl = document.getElementById('list-view');
+  listEl.innerHTML = '';
+  const byDate = {};
+  filtered.sort((a,b) => a.date.localeCompare(b.date)||a.time.localeCompare(b.time)).forEach(ev => {
+    if (!byDate[ev.date]) byDate[ev.date] = [];
+    byDate[ev.date].push(ev);
+  });
+  if (!Object.keys(byDate).length) {
+    listEl.innerHTML = '<div class="empty-state"><h3>該当するイベントがありません</h3><p>フィルターを変更するか、スプレッドシートにイベントを追加してください。</p></div>';
+    return;
+  }
+  const days = ['日','月','火','水','木','金','土'];
+  Object.entries(byDate).forEach(([date, events]) => {
+    const d = new Date(date);
+    const group = document.createElement('div'); group.className = 'list-date-group';
+    group.innerHTML = `<div class="list-date-header"><div class="list-date-num">${d.getDate()}</div><div class="list-date-meta">${d.getMonth()+1}月 ${days[d.getDay()]}曜日</div><div class="list-date-line"></div></div>`;
+    events.forEach(ev => {
+      const v = VENUES[ev.venue];
+      if (!v) return;
+      const areaClass = v.area === 'shinsaibashi' ? 'tag-area-s' : 'tag-area-u';
+      const areaLabel = v.area === 'shinsaibashi' ? '心斎橋' : '梅田';
+      const card = document.createElement('div');
+      card.className = 'event-card';
+      card.style.borderColor = GENRE_COLORS[ev.genre];
+      card.innerHTML = `
+        <div style="background:${GENRE_COLORS[ev.genre]}"></div>
+        <div class="event-card-time">${ev.time}<span>OPEN</span></div>
+        <div class="event-card-body">
+          <div class="event-card-tags">
+            <span class="tag tag-${ev.genre}">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</span>
+            <span class="tag ${areaClass}">${areaLabel}</span>
+            <span class="tag tag-venue">${v.name}</span>
+          </div>
+          <div class="event-card-title">${ev.title}</div>
+          <div class="event-card-detail">${ev.acts}</div>
+        </div>
+        <div class="event-card-right">
+          <button class="ticket-btn">詳細 →</button>
+          <div class="event-card-price">${ev.price}</div>
+        </div>`;
+      card.onclick = () => openDetail(ev);
+      group.appendChild(card);
+    });
+    listEl.appendChild(group);
+  });
+}
+
+// ===== 表示切替 =====
+function switchView(v) {
+  currentView = v;
+  document.getElementById('cal-view').style.display = v === 'cal' ? '' : 'none';
+  document.getElementById('list-view').style.display = v === 'list' ? '' : 'none';
+  document.getElementById('btn-cal').classList.toggle('active', v === 'cal');
+  document.getElementById('btn-list').classList.toggle('active', v === 'list');
+  render();
+}
+
+// ===== 月移動 =====
+function changeMonth(dir) {
+  curMonth += dir;
+  if (curMonth < 0) { curMonth = 11; curYear--; }
+  if (curMonth > 11) { curMonth = 0; curYear++; }
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('month-display').textContent = `${curYear}年 ${months[curMonth]}`;
+  render();
+}
+
+// ===== 詳細パネル =====
+function openDetail(ev) {
+  selectedEventId = ev.id;
+  const v = VENUES[ev.venue];
+  if (!v) return;
+  const areaLabel = v.area === 'shinsaibashi' ? '心斎橋エリア' : '梅田エリア';
+  const areaColor = v.area === 'shinsaibashi' ? 'var(--shinsaibashi)' : 'var(--umeda)';
+  const badge = document.getElementById('d-area-badge');
+  badge.textContent = areaLabel; badge.style.borderColor = areaColor; badge.style.color = areaColor;
+  document.getElementById('d-title').textContent = ev.title;
+  document.getElementById('d-venue').textContent = `${v.name} — 収容${v.cap}人`;
+  const d = new Date(ev.date);
+  const days = ['日','月','火','水','木','金','土'];
+  document.getElementById('d-body').innerHTML = `
+    <div class="detail-row"><div class="detail-key">日時</div><div class="detail-val">${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${days[d.getDay()]}）<br>開演 ${ev.time}</div></div>
+    <div class="detail-row"><div class="detail-key">ジャンル</div><div class="detail-val" style="color:${GENRE_COLORS[ev.genre]};font-weight:500;">${GENRE_ICONS[ev.genre]} ${GENRE_LABELS[ev.genre]}</div></div>
+    <div class="detail-row"><div class="detail-key">会場</div><div class="detail-val">${v.name}<br><span style="color:var(--ink3);font-size:0.68rem;">${areaLabel}</span></div></div>
+    <div class="detail-row"><div class="detail-key">料金</div><div class="detail-val">${ev.price}</div></div>
+    <div class="detail-row"><div class="detail-key">出演</div><div class="detail-val">${ev.acts}</div></div>`;
+  const ticketBtn = document.getElementById('d-ticket');
+  ticketBtn.href = ev.ticket && ev.ticket !== '#' ? ev.ticket : '#';
+  ticketBtn.style.opacity = ev.ticket && ev.ticket !== '#' ? '1' : '0.4';
+  document.getElementById('detail-panel').classList.add('open');
+}
+function closeDetail() {
+  selectedEventId = null;
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+// ===== 管理フォーム（一時追加） =====
+function openAdmin() { document.getElementById('admin-modal').classList.add('open'); }
+function closeAdmin() { document.getElementById('admin-modal').classList.remove('open'); }
+function closeAdminOutside(e) { if (e.target === document.getElementById('admin-modal')) closeAdmin(); }
+
+function submitEvent() {
+  const title = document.getElementById('f-title').value.trim();
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const venue = document.getElementById('f-venue').value;
+  const genre = document.querySelector('input[name="genre"]:checked').value;
+  const price = document.getElementById('f-price').value || '—';
+  const acts = document.getElementById('f-detail').value || '—';
+  const ticket = document.getElementById('f-ticket').value || '#';
+  if (!title || !date) { showToast('⚠ タイトルと日付は必須です'); return; }
+  EVENTS.push({ id: `manual_${Date.now()}`, title, date, time, venue, genre, price, acts, ticket });
+  closeAdmin();
+  render();
+  showToast(`✓ 「${title}」を一時追加しました（スプレッドシートへの保存をお忘れなく）`);
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-date').value = '';
+  document.getElementById('f-detail').value = '';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+// ===== 初期化 =====
+(function init() {
+  const now = new Date();
+  curYear = now.getFullYear();
+  curMonth = now.getMonth();
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  document.getElementById('month-display').textContent = `${curYear}年 ${months[curMonth]}`;
+  buildVenueLists();
+  loadFromSheet();
+})();
+</script>
+</body>
+</html>
