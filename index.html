@@ -518,7 +518,7 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
         </div>
         <div class="form-row">
           <label class="form-label">新しいURLを設定 *</label>
-          <input class="form-input" id="sheet-url-input" type="url" placeholder="https://docs.google.com/spreadsheets/d/XXXX/pub?output=csv">
+          <input class="form-input" id="sheet-url-input" type="url" placeholder="https://script.google.com/macros/s/xxxxxx/exec">
         </div>
         <div class="form-row" style="margin-top:0.8rem;">
           <button class="form-submit" onclick="saveSheetUrl()">💾 保存して今すぐ読み込む</button>
@@ -1012,7 +1012,8 @@ function closeAdmin() { document.getElementById('admin-overlay').classList.remov
 function closeAdminOutside(e) { if(e.target===document.getElementById('admin-overlay')) closeAdmin(); }
 function saveSheetUrl() {
   const u=document.getElementById('sheet-url-input').value.trim();
-  if(!u||!u.includes('spreadsheets')){ showToast('⚠ 正しいURLを入力してください'); return; }
+  const valid = u && (u.includes('spreadsheets') || u.includes('script.google.com'));
+  if(!valid){ showToast('⚠ 正しいURLを入力してください'); return; }
   setSheetUrl(u); closeAdmin(); showLoading('読み込み中...'); loadFromSheet(true);
 }
 function submitEvent() {
