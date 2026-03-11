@@ -1004,8 +1004,8 @@ function changeMonth(d) {
 // ===== View switch =====
 function switchView(v) {
   currentView=v;
-  document.getElementById('cal-view').style.display=v==='cal'?'':'none';
-  document.getElementById('list-view').style.display=v==='list'?'':'none';
+  document.getElementById('cal-view').style.display  = v==='cal'  ? 'block' : 'none';
+  document.getElementById('list-view').style.display = v==='list' ? 'block' : 'none';
   document.getElementById('btn-cal').classList.toggle('active',v==='cal');
   document.getElementById('btn-list').classList.toggle('active',v==='list');
   closeDayPanel(); render();
