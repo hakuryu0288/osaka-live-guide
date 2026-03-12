@@ -751,16 +751,24 @@ function parseCSV(text) {
 // ===== Load =====
 async function loadFromSheet(isManual = false) {
   const url = getSheetUrl();
-  if (!url) { loadSampleData(); hideLoading(); scheduleNext(); render(); return; }
+  console.log('SHEET_URL:', url);
+  if (!url) { console.log('URLなし→サンプル'); loadSampleData(); hideLoading(); scheduleNext(); render(); return; }
   try {
     const sep = url.includes('?') ? '&' : '?';
-    const res = await fetch(url + sep + 't=' + Date.now());
+    const fetchUrl = url + sep + 't=' + Date.now();
+    console.log('fetch先:', fetchUrl);
+    const res = await fetch(fetchUrl);
+    console.log('status:', res.status);
+    const text = await res.text();
+    console.log('取得テキスト先頭:', text.slice(0, 100));
     if (!res.ok) throw new Error(res.status);
-    EVENTS = parseCSV(await res.text());
+    EVENTS = parseCSV(text);
+    console.log('パース結果:', EVENTS.length, '件');
     if (isManual) showToast(`✓ ${EVENTS.length}件 読み込み完了`);
   } catch(e) {
+    console.error('fetch失敗:', e);
     if (isManual) showToast('⚠ 読み込み失敗。URLを確認してください。');
-    if (!EVENTS.length) loadSampleData();
+    // サンプルは出さない
   }
   hideLoading(); scheduleNext(); render();
 }
