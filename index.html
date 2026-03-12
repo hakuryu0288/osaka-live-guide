@@ -716,7 +716,7 @@ function exitAdminMode() {
 }
 
 // ===== Sheet URL =====
-let SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSJS9ygZtSKS0rzlWOk1hLlkRjHeleR8AwNO8mickvGxuW2-uA6E--QZYLC0vMtAunDTU_lXOhZrUXl/pub?gid=0&single=true&output=csv';
+let SHEET_URL = 'https://script.google.com/macros/s/AKfycbzkm9-UcBzQHnmBeYxQbswD3Q8TXVc9P6hbgajQHDBFTc7gbU1j3ai8VZkpHc3-qG5S/exec';
 function getSheetUrl() { try { return localStorage.getItem('olg_sheet_url') || ''; } catch(e) { return SHEET_URL; } }
 function setSheetUrl(u) { SHEET_URL = u; try { localStorage.setItem('olg_sheet_url', u); } catch(e) {} }
 
