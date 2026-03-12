@@ -723,8 +723,10 @@ function setSheetUrl(u) { SHEET_URL = u; try { localStorage.setItem('olg_sheet_u
 // ===== CSV =====
 function parseCSV(text) {
   const lines = text.trim().split('\n');
-  if (lines.length < 2) return [];
-  return lines.slice(1).reduce((acc, line, i) => {
+  if (!lines.length) return [];
+  // GASがヘッダーをスキップして返すので slice(1) 不要
+  // ただし1行目がヘッダーの場合も考慮して date形式チェックで自動判別
+  return lines.reduce((acc, line, i) => {
     const cols = []; let cur = '', inQ = false;
     for (const c of line) {
       if (c === '"') { inQ = !inQ; }
@@ -733,14 +735,13 @@ function parseCSV(text) {
     }
     cols.push(cur.trim());
     const [date, open, time, title, vRaw, gRaw, price, acts, ticket] = cols;
-    // 列構成: A:date B:open(オープン) C:time(開演) D:title E:venue F:genre G:price H:acts I:ticket_url
+    // date形式チェック（YYYY-MM-DD）に合わない行はスキップ（ヘッダー行など）
     if (!date || !title || !/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) return acc;
     const vk = (vRaw||'').toLowerCase().trim();
     const venue = VENUE_ALIASES[vk] || vk;
     if (!VENUES[venue]) return acc;
     const gm = {'アイドル':'idol','idol':'idol','バンド':'band','band':'band','その他':'other','other':'other'};
     const genre = gm[(gRaw||'').toLowerCase().trim()] || 'other';
-    // 時刻の秒を除去（17:00:00 → 17:00）
     const normalizeTime = t => (t||'').trim().replace(/^(\d{1,2}:\d{2}):\d{2}$/, '$1') || '';
     acc.push({ id:`s${i}`, date:date.trim(), open:normalizeTime(open), time:normalizeTime(time)||'—', title:(title||'').trim(), venue, genre, price:(price||'').trim()||'—', acts:(acts||'').trim()||'—', ticket:(ticket||'').trim()||'#' });
     return acc;
