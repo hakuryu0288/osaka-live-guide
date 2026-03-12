@@ -155,7 +155,26 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
 .day-panel-title { font-family:'Syne',sans-serif; font-weight:700; font-size:0.82rem; }
 .day-panel-close { border:none; background:none; font-size:0.9rem; cursor:pointer; color:var(--ink3); padding:0.2rem 0.5rem; border:1px solid var(--border); font-family:'Syne Mono',monospace; font-size:0.58rem; }
 
-/* ===== LIST VIEW ===== */
+/* ===== 投稿フォーム ===== */
+.submit-section { background:var(--bg2); border-top:2px solid var(--border); padding:2.5rem 1rem 3rem; }
+.submit-inner { max-width:640px; margin:0 auto; }
+.submit-header { margin-bottom:1.5rem; }
+.submit-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; margin-bottom:0.4rem; }
+.submit-desc { font-size:0.68rem; color:var(--ink3); line-height:1.6; }
+.sform-row { display:flex; flex-direction:column; gap:0.3rem; margin-bottom:0.8rem; }
+.sform-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-bottom:0; }
+.sform-label { font-size:0.6rem; font-weight:700; letter-spacing:0.08em; color:var(--ink2); text-transform:uppercase; }
+.sform-input { background:var(--white); border:1px solid var(--border); border-radius:4px; padding:0.55rem 0.7rem; font-size:0.75rem; color:var(--ink1); font-family:'Noto Sans JP',sans-serif; outline:none; width:100%; transition:border-color 0.15s; }
+.sform-input:focus { border-color:var(--accent); }
+.sform-submit { width:100%; background:var(--accent); color:white; border:none; border-radius:4px; padding:0.85rem; font-size:0.78rem; font-weight:700; font-family:'Syne',sans-serif; letter-spacing:0.1em; cursor:pointer; margin-top:0.8rem; transition:opacity 0.2s; }
+.sform-submit:hover { opacity:0.85; }
+.sform-submit:disabled { opacity:0.5; cursor:not-allowed; }
+.submit-thanks { text-align:center; padding:2rem 1rem; }
+.thanks-icon { width:48px; height:48px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin:0 auto 1rem; }
+.thanks-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; margin-bottom:0.5rem; }
+.thanks-desc { font-size:0.7rem; color:var(--ink3); line-height:1.7; }
+
+
 #list-view { display:none; }
 .list-date-group { }
 .list-date-header { padding:0.55rem 1rem 0.4rem; display:flex; align-items:center; gap:0.7rem; background:var(--bg2); border-bottom:1px solid var(--border); border-top:1px solid var(--border); position:sticky; top:var(--header-h-sp); z-index:10; }
@@ -475,6 +494,96 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans JP',sans-s
   </div><!-- /cal-column -->
 </div><!-- /body-wrap -->
 
+<!-- ===== 投稿フォームセクション ===== -->
+<div class="submit-section">
+  <div class="submit-inner">
+    <div class="submit-header">
+      <div class="submit-title">📝 イベント情報を投稿する</div>
+      <div class="submit-desc">掲載されていないライブ情報をお知らせください。確認後に掲載します。</div>
+    </div>
+    <div class="submit-form" id="submit-form">
+      <div class="sform-row-2">
+        <div class="sform-row">
+          <label class="sform-label">日付 *</label>
+          <input class="sform-input" id="sf-date" type="date">
+        </div>
+        <div class="sform-row">
+          <label class="sform-label">会場 *</label>
+          <select class="sform-input" id="sf-venue">
+            <option value="">選択してください</option>
+            <optgroup label="心斎橋エリア">
+              <option value="fanj">FanjTwice</option>
+              <option value="bigcat">BIGCAT</option>
+              <option value="janus">JANUS</option>
+              <option value="osakamuse">OSAKA MUSE</option>
+              <option value="drop">心斎橋DROP</option>
+              <option value="beyond">心斎橋BEYOND</option>
+              <option value="sunhall">SUNHALL</option>
+              <option value="joule">CLUB JOULE</option>
+              <option value="anima">ANIMA</option>
+              <option value="numgate">NUMBER GATE</option>
+            </optgroup>
+            <optgroup label="梅田エリア">
+              <option value="banana">バナナホール</option>
+              <option value="amhall">アムホール</option>
+              <option value="zeela">Zeela</option>
+              <option value="bangboo">BANGBOO</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="sform-row-2">
+        <div class="sform-row">
+          <label class="sform-label">OPEN</label>
+          <input class="sform-input" id="sf-open" type="time">
+        </div>
+        <div class="sform-row">
+          <label class="sform-label">START</label>
+          <input class="sform-input" id="sf-time" type="time">
+        </div>
+      </div>
+      <div class="sform-row">
+        <label class="sform-label">イベント名 *</label>
+        <input class="sform-input" id="sf-title" type="text" placeholder="例: アイドルナイト vol.1">
+      </div>
+      <div class="sform-row-2">
+        <div class="sform-row">
+          <label class="sform-label">ジャンル</label>
+          <select class="sform-input" id="sf-genre">
+            <option value="idol">🎤 アイドル</option>
+            <option value="band">🎸 バンド</option>
+            <option value="other">🎵 その他</option>
+          </select>
+        </div>
+        <div class="sform-row">
+          <label class="sform-label">料金</label>
+          <input class="sform-input" id="sf-price" type="text" placeholder="¥2,500（+1D）">
+        </div>
+      </div>
+      <div class="sform-row">
+        <label class="sform-label">出演者</label>
+        <input class="sform-input" id="sf-acts" type="text" placeholder="例: グループA / グループB">
+      </div>
+      <div class="sform-row">
+        <label class="sform-label">チケットURL</label>
+        <input class="sform-input" id="sf-ticket" type="url" placeholder="https://...">
+      </div>
+      <div class="sform-row">
+        <label class="sform-label">コメント（任意）</label>
+        <input class="sform-input" id="sf-note" type="text" placeholder="補足情報があればどうぞ">
+      </div>
+      <button class="sform-submit" onclick="submitUserEvent()">送信する →</button>
+    </div>
+    <!-- 送信完了メッセージ -->
+    <div class="submit-thanks" id="submit-thanks" style="display:none;">
+      <div class="thanks-icon">✓</div>
+      <div class="thanks-title">送信しました！</div>
+      <div class="thanks-desc">情報をお寄せいただきありがとうございます。確認後に掲載いたします。</div>
+      <button class="sform-submit" style="margin-top:1.2rem;max-width:200px;" onclick="resetSubmitForm()">続けて投稿する</button>
+    </div>
+  </div>
+</div>
+
 <!-- DETAIL (bottom sheet SP / right panel PC) -->
 <div class="detail-overlay" id="detail-overlay" onclick="closeDetailOutside(event)">
   <div class="detail-sheet">
@@ -664,6 +773,60 @@ let autoUpdateTimer = null;
 let nextUpdateAt = null;
 let isAdminMode = false;
 let searchQuery = '';
+
+// ===== 投稿フォーム =====
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzBfD3ZxptEZHJz3QLXS9g01u1pvJFKBgzop5zg5WQGw3kma27mKXcQZdwiC0RZ9kYc/exec';
+
+async function submitUserEvent() {
+  const date  = document.getElementById('sf-date').value;
+  const title = document.getElementById('sf-title').value.trim();
+  const venue = document.getElementById('sf-venue').value;
+  if (!date || !title || !venue) { showToast('⚠ 日付・イベント名・会場は必須です'); return; }
+
+  const btn = document.querySelector('.sform-submit');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  const payload = {
+    date,
+    open:   document.getElementById('sf-open').value,
+    time:   document.getElementById('sf-time').value,
+    title,
+    venue,
+    genre:  document.getElementById('sf-genre').value,
+    price:  document.getElementById('sf-price').value.trim(),
+    acts:   document.getElementById('sf-acts').value.trim(),
+    ticket: document.getElementById('sf-ticket').value.trim(),
+    note:   document.getElementById('sf-note').value.trim(),
+  };
+
+  try {
+    await fetch(SUBMIT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    // no-corsのためレスポンスは取れないが送信は成功とみなす
+    document.getElementById('submit-form').style.display = 'none';
+    document.getElementById('submit-thanks').style.display = 'block';
+  } catch(e) {
+    showToast('⚠ 送信に失敗しました。時間をおいて再度お試しください。');
+    btn.disabled = false;
+    btn.textContent = '送信する →';
+  }
+}
+
+function resetSubmitForm() {
+  ['sf-date','sf-open','sf-time','sf-title','sf-price','sf-acts','sf-ticket','sf-note'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('sf-venue').value = '';
+  document.getElementById('sf-genre').value = 'idol';
+  document.getElementById('submit-form').style.display = 'block';
+  document.getElementById('submit-thanks').style.display = 'none';
+  const btn = document.querySelector('.sform-submit');
+  btn.disabled = false;
+  btn.textContent = '送信する →';
+}
 
 // ===== 検索 =====
 function onSearchInput(val) {
