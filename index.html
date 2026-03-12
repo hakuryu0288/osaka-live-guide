@@ -753,7 +753,8 @@ async function loadFromSheet(isManual = false) {
   const url = getSheetUrl();
   if (!url) { loadSampleData(); hideLoading(); scheduleNext(); render(); return; }
   try {
-    const res = await fetch(url + '&t=' + Date.now());
+    const sep = url.includes('?') ? '&' : '?';
+    const res = await fetch(url + sep + 't=' + Date.now());
     if (!res.ok) throw new Error(res.status);
     EVENTS = parseCSV(await res.text());
     if (isManual) showToast(`✓ ${EVENTS.length}件 読み込み完了`);
